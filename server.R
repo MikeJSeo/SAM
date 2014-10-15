@@ -108,14 +108,6 @@ shinyServer(function(input, output) {
         
         x = as.matrix(x)
         class(x) = "numeric"
-        
-#        if (sum(is.na(x)) > 0) {
-#          require(impute)
-#          x = impute.knn(x, k = input$numberOfNeighbors)
-#          if (!is.matrix(x)) {
-#            x = x$data
-#          }
-#        }
 
         geneid = dat[-1,2]
         genenames = dat[-1,1]
@@ -226,17 +218,12 @@ shinyServer(function(input, output) {
   output$siggenes.table.up <- renderDataTable({
     
     siggenes.table = getSiggenesTable()
-    #write.csv(siggenes.table$genes.up, file = "siggenestable.csv")
     result = getResult()
     delta.table = result$delta.table
-#  writeWorksheetToFile("result.xlsx", data = list(i1 = as.data.frame(delta.table), i2 = as.data.frame(siggenes.table$genes.up), i3 = as.data.frame(siggenes.table$genes.lo)),
- #                        sheet = c("FirstSheet", "SecondSheet", "FirstSheet"))
+
     if(!is.null(siggenes.table$genes.up)){
       siggenes.table$genes.up
     }
-  #  else if(!is.null(siggenes.table$genes.up[,-3])){
-    #  siggenes.table$genes.up[,-3]
-  #  }
   
   })
   
