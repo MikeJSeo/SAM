@@ -306,22 +306,15 @@ shinyServer(function(input, output) {
 
 
   output$downloadData <- downloadHandler(
-    filename = function() { "data.xlsx" },
+    filename = function() { "result.xlsx" },
     content = function(file) {
       siggenes.table = getSiggenesTable()
       result = getResult()
       delta.table = result$delta.table
       
       fname = paste(file, "xlsx", sep = ".")
-#      wb = loadWorkbook(fname, create = TRUE)
-#      createSheet(wb, name = c("Sheet1"))
-#      writeWorksheet(wb, c(1:3), sheet = "Sheet1")
-#      saveWorkbook(wb)
-#      file.rename(fname, file)
       writeWorksheetToFile(fname, data = list(i1 = delta.table, i2 = siggenes.table$genes.up, i3 = siggenes.table$genes.lo), sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
-  #    saveWorkbook(wb)
       file.rename(fname, file)
-  
 
       }
     )

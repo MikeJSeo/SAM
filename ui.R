@@ -27,7 +27,7 @@ shinyUI(pageWithSidebar(
       numericInput("min.foldchange", label = "Minimum fold change", min = 1, value = 0, step = 0.01) 
     ),
     numericInput("dif", label = "Hypothesized mean difference in expression", value = 0),
-    downloadButton("downloadData","Save Data as CSV File"),
+    downloadButton("downloadData","Save Result as XLSX File"),
     tags$hr()
     
     ),
