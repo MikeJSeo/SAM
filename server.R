@@ -318,8 +318,7 @@ shinyServer(function(input, output) {
 #      writeWorksheet(wb, c(1:3), sheet = "Sheet1")
 #      saveWorkbook(wb)
 #      file.rename(fname, file)
-      writeWorksheetToFile(fname, data = list(i1 = as.data.frame(delta.table), i2 = as.data.frame(siggenes.table$genes.up), i3 = as.data.frame(siggenes.table$genes.lo)),
-                            sheet = c("FirstSheet", "SecondSheet", "ThirdSheet"))
+      writeWorksheetToFile(fname, data = list(i1 = delta.table, i2 = siggenes.table$genes.up, i3 = siggenes.table$genes.lo), sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
   #    saveWorkbook(wb)
       file.rename(fname, file)
   
