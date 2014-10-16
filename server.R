@@ -335,11 +335,11 @@ shinyServer(function(input, output) {
         dataname = c(dataname, "delta table")
       }
       if(!is.null(siggenes.table$genes.up)){
-        data$siggenes.table.genes.up = siggenes.table$genes.up
+        data$siggenes.table.genes.up = as.data.frame(siggenes.table$genes.up)
         dataname = c(dataname, "Postivie Genes")
       }
       if(!is.null(siggenes.table$genes.lo)){
-        data$siggenes.table.genes.lo = siggenes.table$genes.lo
+        data$siggenes.table.genes.lo = as.data.frame(siggenes.table$genes.lo)
         dataname = c(dataname, "Negative Genes")
       }
       
