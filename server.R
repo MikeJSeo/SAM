@@ -327,7 +327,7 @@ shinyServer(function(input, output) {
     #  samr.assess.samplesize.obj$results[,,4]  
       
       fname = paste(file, "xlsx", sep = ".")
-      data = list(delta.table, siggnes.table$genes.up,siggenes.table$genes.lo)
+      data = list(delta.table, siggenes.table$genes.up,siggenes.table$genes.lo)
       writeWorksheetToFile(fname, data = data, sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
       file.rename(fname, file)
 
