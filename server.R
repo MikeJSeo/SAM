@@ -343,7 +343,6 @@ shinyServer(function(input, output) {
         dataname = c(dataname, "Negative Genes")
       }
       
-      data = list(delta.table, siggenes.table.genes.up,siggenes.table.genes.lo)
       writeWorksheetToFile(fname, data = data, sheet = dataname)
       file.rename(fname, file)
 
