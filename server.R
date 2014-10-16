@@ -328,7 +328,7 @@ shinyServer(function(input, output) {
       
       fname = paste(file, "xlsx", sep = ".")
       data = list()
-      datanames = c()
+      dataname = c()
     
       if(!is.null(delta.table)){
         data$delta.table = delta.table
