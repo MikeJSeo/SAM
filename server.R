@@ -343,10 +343,10 @@ shinyServer(function(input, output) {
         dataname = c(dataname, "Negative Genes")
       }
       if(!is.null(samr.assess.samplesize.obj)){
-        data$sampleTable1 = data$samr.assess.samplesize.obj$results[,,1]
-        data$sampleTable2 = data$samr.assess.samplesize.obj$results[,,2]
-        data$sampleTable3 = data$samr.assess.samplesize.obj$results[,,3]
-        data$sampleTable4 = data$samr.assess.samplesize.obj$results[,,4]
+        data$sampleTable1 = samr.assess.samplesize.obj$results[,,1]
+        data$sampleTable2 = samr.assess.samplesize.obj$results[,,2]
+        data$sampleTable3 = samr.assess.samplesize.obj$results[,,3]
+        data$sampleTable4 = samr.assess.samplesize.obj$results[,,4]
         
         dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
         dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
