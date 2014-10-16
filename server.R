@@ -52,6 +52,24 @@ shinyServer(function(input, output) {
     }
   })
   
+  output$allPositiveGenesText <- renderText({
+    
+    allgenes = getAllgenesTable()
+    
+    if(!is.null(allgenes)){
+      paste("Positive Genes (", allgenes$ngenes.up, ")", sep = "")
+    }
+  })
+  
+  output$allNegativeGenesText <- renderText({
+    
+    allgenes = getAllgenesTable()
+    
+    if(!is.null(allgenes)){
+      paste("Negative Genes (", allgenes$ngenes.lo, ")", sep = "")
+    }
+  })
+  
   output$deltaTableText <- renderText({
     if(!is.null(getResult())){
       "Delta Table"
@@ -147,8 +165,24 @@ shinyServer(function(input, output) {
       delta.table = result$delta.table
       min.foldchange = input$min.foldchange
     
-      siggenes.table = samr.compute.siggenes.table(samr.obj,delta, data, delta.table, min.foldchange = min.foldchange)
+      siggenes.table = samr.compute.siggenes.table(samr.obj,delta, data, delta.table, min.foldchange = min.foldchange, compute.localfdr= input$localFDR)
       siggenes.table
+    }
+  })
+  
+  
+  getAllgenesTable = reactive({
+    
+    if(!is.null(getResult())){
+      result = getResult()
+      delta = findDelta()
+      samr.obj = result$samr.obj
+      data = result$data
+      delta.table = result$delta.table
+      min.foldchange = input$min.foldchange
+      
+      Allgenes = samr.compute.siggenes.table(samr.obj,delta, data, delta.table, min.foldchange = min.foldchange, compute.localfdr= input$localFDR, all.genes= TRUE)
+      Allgenes
     }
   })
   
@@ -265,11 +299,26 @@ shinyServer(function(input, output) {
   
   })
   
+  output$Allgenes.table.up = renderDataTable({
+    Allgenes = getAllgenesTable()  
+    
+    if(!is.null(Allgenes$genes.up)){
+      Allgenes$genes.up
+    }
+  })
+  
+  output$Allgenes.table.lo = renderDataTable({
+    Allgenes = getAllgenesTable()  
+    
+    if(!is.null(Allgenes$genes.lo)){
+      Allgenes$genes.lo
+    }
+  })
+  
+  
   output$siggenes.table.up <- renderDataTable({
     
     siggenes.table = getSiggenesTable()
-    result = getResult()
-    delta.table = result$delta.table
 
     if(!is.null(siggenes.table$genes.up)){
       siggenes.table$genes.up
@@ -314,7 +363,17 @@ shinyServer(function(input, output) {
     
   })
 
-
+  
+  output$allGenes = renderDataTable({
+    
+    result = getResult()
+    
+    if(!is.null(result)){     
+      data = result$data
+      x = cbind(data$geneid, data$genenames, data$x)
+      x
+    }
+  })
 
   output$downloadData <- downloadHandler(
     filename = function() { "result.xlsx" },

@@ -87,6 +87,7 @@ shinyUI(pageWithSidebar(
       tabPanel("SAM Plot", h3(textOutput("samPlotText")), plotOutput("samrPlot")), 
       tabPanel("Delta Table", h3(textOutput("deltaTableText")), tableOutput("deltaTable")),
       tabPanel("Significant Genes", h3(textOutput("positiveGenesText")), dataTableOutput("siggenes.table.up"), h3(textOutput("negativeGenesText")), dataTableOutput("siggenes.table.lo")),
+      tabPanel("All Genes", h3(textOutput("allPositiveGenesText")), dataTableOutput("Allgenes.table.up"), h3(textOutput("allNegativeGenesText")), dataTableOutput("Allgenes.table.lo")),
       tabPanel("Sample Size", h3(textOutput("sampleSizePlotText")), plotOutput("samplePlot"),  h3(textOutput("sampleTableText1")), tableOutput("sampleTable1"), h3(textOutput("sampleTableText2")), tableOutput("sampleTable2"), h3(textOutput("sampleTableText3")), tableOutput("sampleTable3"), h3(textOutput("sampleTableText4")), tableOutput("sampleTable4"))
       
     )
