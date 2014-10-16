@@ -64,6 +64,46 @@ shinyServer(function(input, output) {
     }
   })
   
+  
+  output$sampleSizePlotText <- renderText({
+    if(!is.null(getSampleSize())){
+      "Sample Size Plot"
+    }
+  })
+  
+  
+  output$sampleTableText1 = renderText({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "") 
+    }
+    
+  }) 
+  
+  output$sampleTableText2 = renderText({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "") 
+    }
+    
+  }) 
+  
+  output$sampleTableText3 = renderText({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[3] * samr.assess.samplesize.obj$n, sep = "") 
+    }
+    
+  }) 
+  
+  output$sampleTableText4 = renderText({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "") 
+    }
+    
+  }) 
+  
   output$rseed <- renderUI({
   
     if(input$randomButton == 0){
@@ -76,6 +116,26 @@ shinyServer(function(input, output) {
 
   })
   
+  getSampleSize = reactive({
+    
+    
+    ar = isolate(input$responseType_array)
+    seq = isolate(input$responseType_seq)
+    
+    if(!is.null(getResult()) && ((input$assayType == "array" && (ar == "Two class unpaired" || ar == "Two class paired" || ar == "One class" || ar == "Survival")) || (input$assayType == "seq" && (seq == "Two class unpaired" || seq == "Two class paired" || seq == "Survival")))){
+      
+      result = getResult()
+      samr.obj = result$samr.obj
+      data = result$data
+      dif = input$dif
+      samplesize.factors = input$sampleSizeFactors
+      samplesize.factors = as.numeric(unlist(strsplit(samplesize.factors, ",")))
+      samr.assess.samplesize.obj =  samr.assess.samplesize(samr.obj, data, dif, samplesize.factors)
+      samr.assess.samplesize.obj
+    }
+    
+    
+  })
   
   getSiggenesTable = reactive({
     
@@ -97,23 +157,22 @@ shinyServer(function(input, output) {
     
     input$goButton
     
-    objFile = chooseFile()
+    objFile = isolate(input$iFile)
+    
     if(!is.null(objFile)){
-      
-      Sheet = input$sheet
-      if (!is.null(Sheet)){
-        wb = loadWorkbook(objFile$path)
-        dat = readWorksheet(wb, Sheet, header = FALSE)
-        x = dat[-1, c(-1,-2)]
+      wb = loadWorkbook(objFile$datapath)
+      sheets = getSheets(wb)
+      dat = readWorksheet(wb, sheets, header = FALSE)
+      x = dat[-1, c(-1,-2)]
         
-        x = as.matrix(x)
-        class(x) = "numeric"
+      x = as.matrix(x)
+      class(x) = "numeric"
 
-        geneid = dat[-1,2]
-        genenames = dat[-1,1]
+      geneid = dat[-1,2]
+      genenames = dat[-1,1]
            
-        isolate({
-          
+      isolate({
+      
         firstrow = as.vector(dat[1,c(-1,-2)])
         censoring.status = NULL
         eigengene.number = NULL
@@ -146,57 +205,49 @@ shinyServer(function(input, output) {
         delta.table = samr.compute.delta.table(samr.obj, min.foldchange = input$min.foldchange)
         
         list (data = data, samr.obj = samr.obj, delta.table = delta.table)  
-        })
-      }
+      })
+    }     
+  })
+  
+  output$sampleTable1 = renderTable({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      samr.assess.samplesize.obj$results[,,1] 
+    }
+
+  })
+  
+  output$sampleTable2 = renderTable({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      samr.assess.samplesize.obj$results[,,2] 
+    }    
+    
+  })
+  
+  output$sampleTable3 = renderTable({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      samr.assess.samplesize.obj$results[,,3]  
     }  
-        
-   
   })
   
-  
-
-  chooseFile = reactive({
-    
-    input$goButton
-    
-    inFile = isolate(input$iFile)
-    if (!is.null(inFile)) {
-      # Determine document format;
-      ptn = "\\.[[:alnum:]]{1,5}$"
-      suf = tolower(regmatches(inFile$name, regexpr(ptn, inFile$name)))
- 
-      # Options for Excel documents;
-      if (suf %in% c('.xls', '.xlsx')) {
-        wb = loadWorkbook(inFile$datapath)
-        sheets = getSheets(wb)
-        output$ui <- renderUI({
-          list(
-            selectInput(inputId = "sheet", label = "Select a sheet:", choices = sheets),
-            textInput(inputId = 'arg', label = 'Additional Arguments:', value = ' ')
-          )
-        })
-        return(list(path = inFile$datapath, suf = suf))
-      } 
-      
-      # Options for txt documents;
-      if (suf %in% c('.txt', '.csv')) {
-        output$ui <- renderUI({
-          list(
-            checkboxInput(inputId = 'header', label = 'First line as header', value = TRUE),
-            textInput(inputId = 'sep', label = 'Separator', value = " "),
-            textInput(inputId = 'quote', label = 'Quote', value = '\"'),
-            textInput(inputId = 'arg', label = 'Additional Arguments:', value = ' '),
-            tags$hr()
-          )
-        })
-        return(list(path = inFile$datapath, suf = suf))
-      }
-    } else {return(NULL)}
+  output$sampleTable4 = renderTable({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      samr.assess.samplesize.obj$results[,,4]  
+    }
   })
   
-
+  output$samplePlot = renderPlot({
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(getSampleSize())){
+      samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
+    }
+    
+  }) 
   
-  output$samrPlot <- renderPlot({
+  output$samrPlot = renderPlot({
 
       result = getResult()
       samr.obj = result$samr.obj
@@ -206,8 +257,7 @@ shinyServer(function(input, output) {
         samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
   })
   
-  output$deltaTable <- renderDataTable({
-    
+  output$deltaTable <- renderTable({
     
     result = getResult()
     delta.table = result$delta.table
@@ -231,10 +281,8 @@ shinyServer(function(input, output) {
     
     siggenes.table = getSiggenesTable()
     
-    if(!is.null(siggenes.table$genes.lo)){
-      
+    if(!is.null(siggenes.table$genes.lo)){     
       siggenes.table$genes.lo
-    #  siggenes.table$genes.lo[,-3]
     }
   })
   
@@ -243,7 +291,7 @@ shinyServer(function(input, output) {
     objFile <- chooseFile()
     if (!is.null(objFile)) {
       suf <- objFile$suf
-      # For Excel documents;
+  
       if (suf %in% c('.xls', '.xlsx')) {
         Sheet <- input$sheet
         if (!is.null(Sheet)){
@@ -261,31 +309,7 @@ shinyServer(function(input, output) {
           }
           
         } else {return(NULL)}
-      }
-      # For .txt and .csv documents;
-      if (suf %in% c('.txt', '.csv')) {
-        if (is.null(input$header)) {
-          dat <- read.table(objFile$path)
-          return(dat)
-        } else {
-          if (input$arg %in% c(' ', '')) {
-            dat <- read.table(objFile$path, header=input$header, sep=input$sep, quote=input$quote)
-            return(dat)
-          } else {
-            expr.1 <- paste('"', gsub('\\', '/', objFile$path, fixed = TRUE), '"', sep = '')
-            expr.2 <- paste(expr.1, 
-                            paste('header =', input$header), 
-                            paste('sep =', paste("'", input$sep, "'", sep = '')), 
-                            paste('quote =', paste("'", input$quote, "'", sep = '')), input$arg,  sep = ', ')
-            print(expr.2)
-            expr <- paste('read.table(', expr.2, ')', sep = '')
-            print(expr)
-            dat <- eval(parse(text = expr))
-            return(dat)
-          }
-        }
-      }
-      
+      }   
     } else {return(NULL)}
     
   })
@@ -298,13 +322,16 @@ shinyServer(function(input, output) {
       siggenes.table = getSiggenesTable()
       result = getResult()
       delta.table = result$delta.table
+      samr.assess.samplesize.obj =  getSampleSize()
+
+    #  samr.assess.samplesize.obj$results[,,4]  
       
       fname = paste(file, "xlsx", sep = ".")
-      writeWorksheetToFile(fname, data = list(i1 = delta.table, i2 = siggenes.table$genes.up, i3 = siggenes.table$genes.lo), sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
+      data = list(delta.table, siggnes.table$genes.up,siggenes.table$genes.lo)
+      writeWorksheetToFile(fname, data = data, sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
       file.rename(fname, file)
 
       }
     )
 
-  
 })

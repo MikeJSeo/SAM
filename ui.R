@@ -26,7 +26,12 @@ shinyUI(pageWithSidebar(
     conditionalPanel(condition = "(input.assayType == 'array' && (input.responseType_array == 'Two class unpaired' || input.responseType_array == 'Two class paired' || input.responseType_array == 'Two class unpaired timecourse' || input.responseType_array == 'Two class paired timecourse')) || (input.assayType == 'seq' && (input.responseType_seq == 'Two class unpaired' || input.responseType_seq == 'Two class paired'))",
       numericInput("min.foldchange", label = "Minimum fold change", min = 1, value = 0, step = 0.01) 
     ),
-    numericInput("dif", label = "Hypothesized mean difference in expression", value = 0),
+    
+    conditionalPanel(condition = "(input.assayType == 'array' && (input.responseType_array == 'Two class unpaired' || input.responseType_array == 'Two class paired' || input.responseType_array == 'One class' || input.responseType_array == 'Survival')) || (input.assayType == 'seq' && (input.responseType_seq == 'Two class unpaired' || input.responseType_seq == 'Two class paired' || input.responseType_seq == 'Survival'))", 
+      numericInput("dif", label = "Hypothesized mean difference in expression", value = 0),
+      textInput("sampleSizeFactors", label = "Same size factors - four comma separated values", value = "1,2,3,5")
+    ),
+                      
     downloadButton("downloadData","Save Result as XLSX File"),
     tags$hr()
     
@@ -77,9 +82,11 @@ shinyUI(pageWithSidebar(
 #               ".shiny-output-error:before { visibility: hidden; }"
 #    ),
     tabsetPanel(id='SAM',
-      tabPanel("SAM PLOT", h3(textOutput("samPlotText")), plotOutput("samrPlot")), 
-      tabPanel("Delta Table", h3(textOutput("deltaTableText")), dataTableOutput("deltaTable")),
-      tabPanel("Significant Genes", h3(textOutput("positiveGenesText")), dataTableOutput("siggenes.table.up"), h3(textOutput("negativeGenesText")), dataTableOutput("siggenes.table.lo"))
+      tabPanel("SAM Plot", h3(textOutput("samPlotText")), plotOutput("samrPlot")), 
+      tabPanel("Delta Table", h3(textOutput("deltaTableText")), tableOutput("deltaTable")),
+      tabPanel("Significant Genes", h3(textOutput("positiveGenesText")), dataTableOutput("siggenes.table.up"), h3(textOutput("negativeGenesText")), dataTableOutput("siggenes.table.lo")),
+      tabPanel("Sample Size", h3(textOutput("sampleSizePlotText")), plotOutput("samplePlot"),  h3(textOutput("sampleTableText1")), tableOutput("sampleTable1"), h3(textOutput("sampleTableText2")), tableOutput("sampleTable2"), h3(textOutput("sampleTableText3")), tableOutput("sampleTable3"), h3(textOutput("sampleTableText4")), tableOutput("sampleTable4"))
+      
     )
     
 
