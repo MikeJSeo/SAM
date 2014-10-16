@@ -342,6 +342,18 @@ shinyServer(function(input, output) {
         data$siggenes.table.genes.lo = as.data.frame(siggenes.table$genes.lo)
         dataname = c(dataname, "Negative Genes")
       }
+      if(!is.null(samr.assess.samplesize.obj)){
+        data$sampleTable1 = data$samr.assess.samplesize.obj$results[,,1]
+        data$sampleTable2 = data$samr.assess.samplesize.obj$results[,,2]
+        data$sampleTable3 = data$samr.assess.samplesize.obj$results[,,3]
+        data$sampleTable4 = data$samr.assess.samplesize.obj$results[,,4]
+        
+        dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
+        dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
+        dataSample3 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[3] * samr.assess.samplesize.obj$n, sep = "")
+        dataSample4 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "")
+        dataname = c(dataname, c(dataSample1, dataSample2, dataSample3, dataSample4))
+      }
       
       writeWorksheetToFile(fname, data = data, sheet = dataname)
       file.rename(fname, file)
