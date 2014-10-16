@@ -323,8 +323,6 @@ shinyServer(function(input, output) {
       result = getResult()
       delta.table = result$delta.table
       samr.assess.samplesize.obj =  getSampleSize()
-
-    #  samr.assess.samplesize.obj$results[,,4]  
       
       fname = paste(file, "xlsx", sep = ".")
       data = list()
@@ -332,7 +330,7 @@ shinyServer(function(input, output) {
     
       if(!is.null(delta.table)){
         data$delta.table = delta.table
-        dataname = c(dataname, "delta table")
+        dataname = c(dataname, "Delta Table")
       }
       if(!is.null(siggenes.table$genes.up)){
         data$siggenes.table.genes.up = as.data.frame(siggenes.table$genes.up)

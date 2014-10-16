@@ -31,7 +31,9 @@ shinyUI(pageWithSidebar(
       numericInput("dif", label = "Hypothesized mean difference in expression", value = 0),
       textInput("sampleSizeFactors", label = "Same size factors - four comma separated values", value = "1,2,3,5")
     ),
-                      
+    
+    radioButtons("localFDR", "Output local FDRs", c("No" = FALSE, "Yes" = TRUE)),
+    
     downloadButton("downloadData","Save Result as XLSX File"),
     tags$hr()
     
