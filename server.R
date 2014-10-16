@@ -328,19 +328,23 @@ shinyServer(function(input, output) {
       
       fname = paste(file, "xlsx", sep = ".")
       data = list()
-      dataname
+      datanames = c()
+    
       if(!is.null(delta.table)){
         data$delta.table = delta.table
+        dataname = c(dataname, "delta table")
       }
       if(!is.null(siggenes.table$genes.up)){
         data$siggenes.table.genes.up = siggenes.table$genes.up
+        dataname = c(dataname, "Postivie Genes")
       }
       if(!is.null(siggenes.table$genes.lo)){
         data$siggenes.table.genes.lo = siggenes.table$genes.lo
+        dataname = c(dataname, "Negative Genes")
       }
       
       data = list(delta.table, siggenes.table$genes.up,siggenes.table$genes.lo)
-      writeWorksheetToFile(fname, data = data, sheet = c("Delta Table", "Positive Genes", "Negative Genes"))
+      writeWorksheetToFile(fname, data = data, sheet = dataname)
       file.rename(fname, file)
 
       }
