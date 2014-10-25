@@ -7,14 +7,174 @@ library(GSA)
 shinyServer(function(input, output) {  
   
   
+  
+  output$geneSetPositive = renderText({
+        
+    GSA.list = getGSAList()
+    if(!is.null(GSA.list)){
+      paste("Positive Gene Sets (", GSA.list$nsets.pos, ")", sep = "")      
+    }
+  })
+  
+  output$geneSetNegative = renderText({
+    
+    GSA.list = getGSAList()
+    if(!is.null(GSA.list)){
+      paste("Negative Gene Sets (", GSA.list$nsets.neg, ")", sep = "")      
+    }
+  })
+  
+  
+  output$geneSetFullPositive = renderText({
+    
+    GSAFullList = getGSAFullList()
+    if(!is.null(GSAFullList)){
+      paste("Positive Gene Sets (", GSAFullList$nsets.pos, ")", sep = "")      
+    }
+  })
+  
+  output$geneSetFullNegative = renderText({
+    
+    GSAFullList = getGSAFullList()
+    if(!is.null(GSAFullList)){
+      paste("Negative Gene Sets (", GSAFullList$nsets.neg, ")", sep = "")      
+    }
+  })
+  
+  
+  output$geneSetPlot = renderPlot({
+    
+    GSA = getGSA()
+    
+    if(!is.null(GSA)){
+      GSA.obj = GSA$GSA.obj
+      GSA.plot(GSA.obj, FDRcut = findFDR())
+    }
+
+  })
+  
+  output$positiveGeneSet = renderTable({
+    
+    GSA.list = getGSAList()
+    
+    if(!is.null(GSA.list)){
+      GSA.list$positive
+    }    
+  })
+  
+  output$negativeGeneSet = renderTable({
+    
+    GSA.list = getGSAList()
+    
+    if(!is.null(GSA.list)){
+      GSA.list$negative
+    }    
+  })
+  
+  output$positiveFullGeneSet = renderTable({
+    
+    GSAFullList = getGSAFullList()
+    
+    if(!is.null(GSAFullList)){
+      GSAFullList$positive
+    }    
+  })
+  
+  output$negativeFullGeneSet = renderTable({
+    
+    GSAFullList = getGSAFullList()
+    
+    if(!is.null(GSAFullList)){
+      GSAFullList$negative
+    }    
+  })
+  
+  
+  
+  output$testGeneSet = renderTable({
+    
+    GSA = getGSA()
+    genesets = GSA$genesets
+    GSA.obj = GSA$GSA.obj
+    genenames = GSA$genenames
+  
+    
+    if(!is.null(GSA)){
+      # print(GSA.genescores(39, genesets, GSA.obj, genenames))
+      GSA.genescores(input$geneset.number, genesets, GSA.obj, genenames)
+    }    
+  })
+  
+  getGSAList = reactive({
+    GSA = getGSA()
+    
+    if(!is.null(GSA)){
+      GSA.obj = GSA$GSA.obj
+      geneset.names = GSA$geneset.names
+      GSA.list = GSA.listsets(GSA.obj, geneset.names = geneset.names, FDRcut = findFDR())
+      GSA.list
+    }
+  })
+  
+  getGSAFullList = reactive({
+    GSA = getGSA()
+    
+    if(!is.null(GSA)){
+      GSA.obj = GSA$GSA.obj
+      geneset.names = GSA$geneset.names
+      GSA.list = GSA.listsets(GSA.obj, geneset.names = geneset.names, FDRcut = 2)
+      GSA.list
+    }
+    
+  })
+  
+  getGSA = reactive({
+    
+    input$goButton
+    
+    isolate({
+    
+    data = getData()
+    gmtFile = input$gmtFile
+      
+    if(!is.null(data) && !is.null(gmtFile)){
+      
+      x = data$x
+      y = data$y
+      data = getData()
+      genenames = data$genenames
+      
+      geneset.obj = GSA.read.gmt(gmtFile$datapath)
+      genesets = geneset.obj$genesets
+      geneset.names = geneset.obj$geneset.names
+      
+      GSA.obj = GSA(x,y, genenames=genenames, genesets=genesets, method = "maxmean", resp.type="Two class unpaired", nperms=100, minsize = input$minGeneSet, maxsize = input$maxGeneSet)
+      list(GSA.obj  = GSA.obj, geneset.names = geneset.names, genenames = genenames, genesets = genesets)
+    }
+    })
+  })
+  
+  findFDR = reactive({
+    
+    
+    if(input$fdrChoice == "FDR Slider")
+      input$fdrSlider
+    else if (input$fdrChoice == "Manually Enter FDR")
+      input$fdrInput
+  })
+
+
   findDelta = reactive({
     
     if(input$deltaChoice == "Delta Slider")
       input$deltaSlider
-    else if (input$deltaChoice == "Manually Enter Data")
+    else if (input$deltaChoice == "Manually Enter Delta")
       input$deltaInput
     
   })
+  
+  
+  
   
   survival = function(firstrow){
     
@@ -36,6 +196,7 @@ shinyServer(function(input, output) {
     
     list(y= y, censoring.status = censoring.status)
   }
+  
   
   output$negativeGenesText <- renderText({
     
@@ -62,7 +223,9 @@ shinyServer(function(input, output) {
     }
   })
   
-  output$allNegativeGenesText <- renderText({
+  
+  
+  output$allNegativeGenesText = renderText({
     
     allgenes = getAllgenesTable()
     
@@ -96,7 +259,6 @@ shinyServer(function(input, output) {
     if(!is.null(getSampleSize())){
       paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "") 
     }
-    
   }) 
   
   output$sampleTableText2 = renderText({
@@ -120,7 +282,6 @@ shinyServer(function(input, output) {
     if(!is.null(getSampleSize())){
       paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "") 
     }
-    
   }) 
   
   output$rseed <- renderUI({
@@ -152,8 +313,6 @@ shinyServer(function(input, output) {
       samr.assess.samplesize.obj =  samr.assess.samplesize(samr.obj, data, dif, samplesize.factors)
       samr.assess.samplesize.obj
     }
-    
-    
   })
   
   getSiggenesTable = reactive({
@@ -188,65 +347,71 @@ shinyServer(function(input, output) {
   })
   
   
-  getResult <- reactive({
+  getData = reactive({
     
-    input$goButton
-    
-    objFile = isolate(input$iFile)
-    
+    objFile = input$iFile
     if(!is.null(objFile)){
       wb = loadWorkbook(objFile$datapath)
       sheets = getSheets(wb)
       dat = readWorksheet(wb, sheets, header = FALSE)
       x = dat[-1, c(-1,-2)]
-        
+      
       x = as.matrix(x)
       class(x) = "numeric"
-
-      geneid = dat[-1,2]
-      genenames = dat[-1,1]
-           
-      isolate({
       
-        firstrow = as.vector(dat[1,c(-1,-2)])
-        censoring.status = NULL
-        eigengene.number = NULL
+      geneid = dat[-1,1]
+      genenames = dat[-1,2]
         
-        if( (input$responseType_seq == "Survival" && input$assayType == "seq")
-           || (input$responseType_array == "Survival" && input$assayType == "array")){
-          survival = survival(firstrow)
-          y = survival$y
-          censoring.status = survival$censoring.status
-        }
-        else if( (input$responseType_array == "Pattern discovery" && input$assayType == "array") ){
-          y = NULL
-          eigengene.number = firstrow[1]
-          last = nchar(eigengene.number)
-          eigengene.number = as.numeric(substr(eigengene.number, last, last))
-        }
+      firstrow = as.vector(dat[1,c(-1,-2)])
+      censoring.status = NULL
+      eigengene.number = NULL
         
-        else{
-          y = firstrow
-        } 
+      if( (input$responseType_seq == "Survival" && input$assayType == "seq") || (input$responseType_array == "Survival" && input$assayType == "array")){
+        survival = survival(firstrow)
+        y = survival$y
+        censoring.status = survival$censoring.status
+      }
+      else if( (input$responseType_array == "Pattern discovery" && input$assayType == "array") ){
+        y = NULL
+        eigengene.number = firstrow[1]
+        last = nchar(eigengene.number)
+        eigengene.number = as.numeric(substr(eigengene.number, last, last))
+      }
+      else{
+        y = firstrow
+      } 
         
-        
-        data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number)        
-        resp.type = if(input$assayType == "seq"){input$responseType_seq}else{input$responseType_array} 
-        s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){NULL}else{input$s0.perc}
-        center.arrays = as.logical(input$centerArrays)
-        
-        samr.obj = samr(data, resp.type = resp.type, assay.type = input$assayType, s0.perc = NULL, nperms = input$nperms, center.arrays = center.arrays, testStatistic = input$testStatistic, time.summary.type = input$timeSummaryType,  regression.method = input$regressionMethod, random.seed = input$random.seed)           
-      
-        delta.table = samr.compute.delta.table(samr.obj, min.foldchange = input$min.foldchange)
-        
-        list (data = data, samr.obj = samr.obj, delta.table = delta.table)  
-      })
-    }     
+      data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number)        
+      data
+    }
+    
   })
+  
+  getResult = reactive({
+    
+    input$goButton
+    
+    isolate({
+    data = getData()
+
+    if(!is.null(data)){
+      resp.type = if(input$assayType == "seq"){input$responseType_seq}else{input$responseType_array} 
+      s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){NULL}else{input$s0.perc}
+      center.arrays = as.logical(input$centerArrays)
+        
+      samr.obj = samr(data, resp.type = resp.type, assay.type = input$assayType, s0.perc = NULL, nperms = input$nperms, center.arrays = center.arrays, testStatistic = input$testStatistic, time.summary.type = input$timeSummaryType,  regression.method = input$regressionMethod, random.seed = input$random.seed)           
+      delta.table = samr.compute.delta.table(samr.obj, min.foldchange = input$min.foldchange)
+        
+      list (data = data, samr.obj = samr.obj, delta.table = delta.table)  
+    }
+    
+    })
+  })
+
   
   output$sampleTable1 = renderTable({
     samr.assess.samplesize.obj =  getSampleSize()
-    if(!is.null(getSampleSize())){
+    if(!is.null(samr.assess.samplesize.obj)){
       samr.assess.samplesize.obj$results[,,1] 
     }
 
@@ -254,7 +419,7 @@ shinyServer(function(input, output) {
   
   output$sampleTable2 = renderTable({
     samr.assess.samplesize.obj =  getSampleSize()
-    if(!is.null(getSampleSize())){
+    if(!is.null(samr.assess.samplesize.obj)){
       samr.assess.samplesize.obj$results[,,2] 
     }    
     
@@ -262,37 +427,37 @@ shinyServer(function(input, output) {
   
   output$sampleTable3 = renderTable({
     samr.assess.samplesize.obj =  getSampleSize()
-    if(!is.null(getSampleSize())){
+    if(!is.null(samr.assess.samplesize.obj)){
       samr.assess.samplesize.obj$results[,,3]  
     }  
   })
   
   output$sampleTable4 = renderTable({
     samr.assess.samplesize.obj =  getSampleSize()
-    if(!is.null(getSampleSize())){
+    if(!is.null(samr.assess.samplesize.obj)){
       samr.assess.samplesize.obj$results[,,4]  
     }
   })
   
   output$samplePlot = renderPlot({
     samr.assess.samplesize.obj =  getSampleSize()
-    if(!is.null(getSampleSize())){
+    if(!is.null(samr.assess.samplesize.obj)){
       samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
     }
-    
   }) 
   
   output$samrPlot = renderPlot({
-
-      result = getResult()
-      samr.obj = result$samr.obj
-      delta = findDelta()
-      min.foldchange = input$min.foldchange
-      if(!is.null(result))
-        samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
+    result = getResult()
+    samr.obj = result$samr.obj
+    delta = findDelta()
+    min.foldchange = input$min.foldchange
+    if(!is.null(result))
+      samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
   })
   
-  output$deltaTable <- renderTable({
+  
+  
+  output$deltaTable = renderTable({
     
     result = getResult()
     delta.table = result$delta.table
@@ -336,34 +501,6 @@ shinyServer(function(input, output) {
     }
   })
   
-  
-  output$contents <- renderTable({
-    objFile <- chooseFile()
-    if (!is.null(objFile)) {
-      suf <- objFile$suf
-  
-      if (suf %in% c('.xls', '.xlsx')) {
-        Sheet <- input$sheet
-        if (!is.null(Sheet)){
-          
-          if (input$arg %in% c(' ', '')) {
-            wb <- loadWorkbook(objFile$path)
-            dat <- readWorksheet(wb, Sheet, header = FALSE)
-            return(dat)
-          } else {
-            wb <- loadWorkbook(objFile$path)
-            expr <- paste('readWorksheet(wb, Sheet,', input$arg, ')', sep = '')
-            print(expr)
-            dat <- eval(parse(text = expr))
-            return(dat)
-          }
-          
-        } else {return(NULL)}
-      }   
-    } else {return(NULL)}
-    
-  })
-
   
   output$allGenes = renderDataTable({
     
