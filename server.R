@@ -4,14 +4,46 @@ library(XLConnect)
 library(samr)
 library(GSA)
 
+source("GSA.listsets.revised.R")
+source("GSA.correlate.revised.R")
+source("GSA.plot.revised.R")
+
 shinyServer(function(input, output) {  
   
+  output$geneSetInfo = renderPrint({
+    
+    GSA = getGSA()
+    if(!is.null(GSA)){      
+      geneset.obj = GSA$geneset.obj
+      genenames = GSA$genenames
+      GSA.correlate.revised(geneset.obj, genenames)
+    }
+    
+    
+  })
   
+  output$geneSetInfoText <- renderText({
+    if(!is.null(getGSAList())){
+      "Information for gene set collection"
+    }
+  })
+  
+  output$GSAPlotText <- renderText({
+    if(!is.null(getGSAList())){
+      "GSA Plot"
+    }
+  })
+  
+  output$GeneScoreText <- renderText({
+    if(!is.null(getGSAList())){
+      "Gene Score"
+    }
+  })
   
   output$geneSetPositive = renderText({
         
     GSA.list = getGSAList()
-    if(!is.null(GSA.list)){
+    if(!is.null(GSA.list$nsets.pos)){
       paste("Positive Gene Sets (", GSA.list$nsets.pos, ")", sep = "")      
     }
   })
@@ -19,7 +51,7 @@ shinyServer(function(input, output) {
   output$geneSetNegative = renderText({
     
     GSA.list = getGSAList()
-    if(!is.null(GSA.list)){
+    if(!is.null(GSA.list$nsets.neg)){
       paste("Negative Gene Sets (", GSA.list$nsets.neg, ")", sep = "")      
     }
   })
@@ -48,7 +80,7 @@ shinyServer(function(input, output) {
     
     if(!is.null(GSA)){
       GSA.obj = GSA$GSA.obj
-      GSA.plot(GSA.obj, FDRcut = findFDR())
+      GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
     }
 
   })
@@ -57,7 +89,7 @@ shinyServer(function(input, output) {
     
     GSA.list = getGSAList()
     
-    if(!is.null(GSA.list)){
+    if(!is.na(GSA.list$positive[1])){
       GSA.list$positive
     }    
   })
@@ -66,8 +98,8 @@ shinyServer(function(input, output) {
     
     GSA.list = getGSAList()
     
-    if(!is.null(GSA.list)){
-      GSA.list$negative
+    if(!is.na(GSA.list$negative[1])){
+      GSA.list$negative      
     }    
   })
   
@@ -90,18 +122,15 @@ shinyServer(function(input, output) {
   })
   
   
-  
   output$testGeneSet = renderTable({
     
     GSA = getGSA()
     genesets = GSA$genesets
     GSA.obj = GSA$GSA.obj
     genenames = GSA$genenames
-  
     
     if(!is.null(GSA)){
-      # print(GSA.genescores(39, genesets, GSA.obj, genenames))
-      GSA.genescores(input$geneset.number, genesets, GSA.obj, genenames)
+       GSA.genescores(input$geneset.number, genesets, GSA.obj, genenames)
     }    
   })
   
@@ -111,7 +140,7 @@ shinyServer(function(input, output) {
     if(!is.null(GSA)){
       GSA.obj = GSA$GSA.obj
       geneset.names = GSA$geneset.names
-      GSA.list = GSA.listsets(GSA.obj, geneset.names = geneset.names, FDRcut = findFDR())
+      GSA.list = GSA.listsets.revised(GSA.obj, geneset.names = geneset.names, FDRcut = findFDR())
       GSA.list
     }
   })
@@ -122,7 +151,7 @@ shinyServer(function(input, output) {
     if(!is.null(GSA)){
       GSA.obj = GSA$GSA.obj
       geneset.names = GSA$geneset.names
-      GSA.list = GSA.listsets(GSA.obj, geneset.names = geneset.names, FDRcut = 2)
+      GSA.list = GSA.listsets.revised(GSA.obj, geneset.names = geneset.names, FDRcut = 1)
       GSA.list
     }
     
@@ -149,13 +178,12 @@ shinyServer(function(input, output) {
       geneset.names = geneset.obj$geneset.names
       
       GSA.obj = GSA(x,y, genenames=genenames, genesets=genesets, method = "maxmean", resp.type="Two class unpaired", nperms=100, minsize = input$minGeneSet, maxsize = input$maxGeneSet)
-      list(GSA.obj  = GSA.obj, geneset.names = geneset.names, genenames = genenames, genesets = genesets)
+      list(GSA.obj  = GSA.obj, geneset.names = geneset.names, genenames = genenames, genesets = genesets, geneset.obj = geneset.obj)
     }
     })
   })
   
   findFDR = reactive({
-    
     
     if(input$fdrChoice == "FDR Slider")
       input$fdrSlider
@@ -297,7 +325,6 @@ shinyServer(function(input, output) {
   })
   
   getSampleSize = reactive({
-    
     
     ar = isolate(input$responseType_array)
     seq = isolate(input$responseType_seq)

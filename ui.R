@@ -116,13 +116,11 @@ shinyUI(fluidPage(
 
     conditionalPanel(condition = "input.analysisType == 'Gene sets'",
       tabsetPanel(id = 'gene set',
-        tabPanel("GSA Plot", plotOutput("geneSetPlot")),    
+        tabPanel("GSA Plot", h3(textOutput("GSAPlotText")), plotOutput("geneSetPlot")),    
         tabPanel("Significant Gene Set", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet")),
-        tabPanel("Gene Score", 
-          numericInput("geneset.number", "geneset number", value= 1, step=1),
-          tableOutput("testGeneSet")       
-        ),
-        tabPanel("All Gene Set",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet"))
+        tabPanel("Gene Score", h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
+        tabPanel("All Gene Set",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet")),
+        tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), verbatimTextOutput("geneSetInfo"))
         )      
     ),
     
