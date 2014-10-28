@@ -598,23 +598,23 @@ shinyServer(function(input, output) {
       
       if(!is.na(GSA.list$positive[1])){
         data$positive = GSA.list$positive
-        dataname = c(dataname, "Positive Gene Sets")
+        dataname = c(dataname, "Significant Positive Gene Sets")
       }    
       
       if(!is.na(GSA.list$negative[1])){
         data$negative = GSA.list$negative      
-        dataname = c(dataname, "Negative Gene Sets")    
+        dataname = c(dataname, "Significant Negative Gene Sets")    
       }
       
       if(!is.null(GSAFullList)){
         data$fullPositive = GSAFullList$positive
-        dummyname = paste("Positive Gene Sets (", GSAFullList$nsets.pos, ")", sep = "")      
+        dummyname = paste("Full Positive Gene Sets (", GSAFullList$nsets.pos, ")", sep = "")      
         dataname = c(dataname, dummyname)
       }
       
       if(!is.null(GSAFullList)){
         data$fullNegative = GSAFullList$negative
-        dummyname = paste("Negative Gene Sets (", GSAFullList$nsets.neg, ")", sep = "")      
+        dummyname = paste("Full Negative Gene Sets (", GSAFullList$nsets.neg, ")", sep = "")      
         dataname = c(dataname, dummyname)
       }
       
