@@ -616,7 +616,7 @@ shinyServer(function(input, output) {
       }
       
       png(file = "GSAPlot.png")
-      GSA.plot(GSA.obj)
+      GSA.plot.revised(GSA.obj)
       dev.off()
       
       if(!is.null(GSA)){
