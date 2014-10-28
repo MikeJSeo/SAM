@@ -599,7 +599,7 @@ shinyServer(function(input, output) {
         createSheet(wb, name = "Significant Gene Sets")
         
         if(!is.na(GSA.list$positive[1])){
-          writeWorksheet(wb, "Positive Gene Sets", sheet = "Significant Gene Sets", startRow = 2, startCol = 3)
+          writeWorksheet(wb, c("Positive Gene Sets"), sheet = "Significant Gene Sets", startRow = 2, startCol = 3)
           writeWorksheet(wb, GSA.list$positive, sheet = "Significant Gene Sets", startRow = 3, startCol = 3)
         }
       }
