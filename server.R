@@ -82,7 +82,6 @@ shinyServer(function(input, output) {
       GSA.obj = GSA$GSA.obj
       GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
     }
-
   })
   
   output$positiveGeneSet = renderTable({
@@ -588,7 +587,7 @@ shinyServer(function(input, output) {
     filename = function() { "result.xlsx" },
     content = function(file) {
       
-      
+      GSA = getGSA()
       GSA.list = getGSAList()
       GSAFullList = getGSAFullList()
       
@@ -614,10 +613,22 @@ shinyServer(function(input, output) {
         createSheet(wb, name = "Full Negative Gene Sets")
         writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
       }
-            
+      
+      png(file = "GSAPlot.png")
+      GSA.plot(GSA$GSA.obj)
+      dev.off()
+      
+      if(!is.null(GSA)){
+        createSheet(wb, name = "GSA Plot")
+        createName(wb, name = "GSA Plot", formula = "GSA!$B$2")
+        addImage(wb, filename = "GSAPlot.png", name = "GSA", originalSize = TRUE) 
+      }
+      
       saveWorkbook(wb)
       file.rename(fname, file)
-        
+      
+      
+      
   #    writeWorksheetToFile(fname, data = data, sheet = dataname)
   #    file.rename(fname, file)
       
