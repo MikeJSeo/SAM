@@ -621,8 +621,8 @@ shinyServer(function(input, output) {
       
       if(!is.null(GSA)){
         createSheet(wb, name = "GSAPlot")
-        createName(wb, name = "GSAPlot", formula = "GSA!$B$2")
-        addImage(wb, filename = "GSAPlot.png", name = "GSA", originalSize = TRUE) 
+        createName(wb, name = "GSAPlot", formula = "GSAPlot!$B$2")
+        addImage(wb, filename = "GSAPlot.png", name = "GSAPlot", originalSize = TRUE) 
       }
       
       saveWorkbook(wb)
