@@ -588,6 +588,7 @@ shinyServer(function(input, output) {
     content = function(file) {
       
       GSA = getGSA()
+      GSA.obj = GSA$GSA.obj
       GSA.list = getGSAList()
       GSAFullList = getGSAFullList()
       
@@ -615,7 +616,7 @@ shinyServer(function(input, output) {
       }
       
       png(file = "GSAPlot.png")
-      GSA.plot(GSA$GSA.obj)
+      GSA.plot(GSA.obj)
       dev.off()
       
       if(!is.null(GSA)){
