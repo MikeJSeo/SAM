@@ -595,6 +595,16 @@ shinyServer(function(input, output) {
       fname = paste(file, "xlsx", sep = ".")
       wb = loadWorkbook(fname, create = TRUE)
       
+      png(file = "GSAPlot.png")
+      GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
+      dev.off()
+      
+      if(!is.null(GSA)){
+        createSheet(wb, name = "GSAPlot")
+        createName(wb, name = "GSAPlot", formula = "GSAPlot!$B$2")
+        addImage(wb, filename = "GSAPlot.png", name = "GSAPlot", originalSize = TRUE) 
+      }
+      
       if(!is.na(GSA.list$positive[1])){
         createSheet(wb, name = "Significant Positive Gene Sets")
         writeWorksheet(wb, GSA.list$positive, sheet = "Significant Positive Gene Sets")            
@@ -615,23 +625,8 @@ shinyServer(function(input, output) {
         writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
       }
       
-      png(file = "GSAPlot.png")
-      GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
-      dev.off()
-      
-      if(!is.null(GSA)){
-        createSheet(wb, name = "GSAPlot")
-        createName(wb, name = "GSAPlot", formula = "GSAPlot!$B$2")
-        addImage(wb, filename = "GSAPlot.png", name = "GSAPlot", originalSize = TRUE) 
-      }
-      
       saveWorkbook(wb)
       file.rename(fname, file)
-      
-      
-      
-  #    writeWorksheetToFile(fname, data = data, sheet = dataname)
-  #    file.rename(fname, file)
       
     }
   )
