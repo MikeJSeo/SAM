@@ -620,8 +620,8 @@ shinyServer(function(input, output) {
       dev.off()
       
       if(!is.null(GSA)){
-        createSheet(wb, name = "GSA Plot")
-        createName(wb, name = "GSA Plot", formula = "GSA!$B$2")
+        createSheet(wb, name = "GSAPlot")
+        createName(wb, name = "GSAPlot", formula = "GSA!$B$2")
         addImage(wb, filename = "GSAPlot.png", name = "GSA", originalSize = TRUE) 
       }
       
