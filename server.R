@@ -595,40 +595,29 @@ shinyServer(function(input, output) {
       fname = paste(file, "xlsx", sep = ".")
       wb = loadWorkbook(fname, create = TRUE)
       
-      if(!is.na(GSA.list$positive[1]) || !is.na(GSA.list$negative[1])){
-        createSheet(wb, name = "Significant Gene Sets")
-        
-        if(!is.na(GSA.list$positive[1])){
-          writeWorksheet(wb, c("Positive Gene Sets"), sheet = "Significant Gene Sets", startRow = 2, startCol = 3)
-          writeWorksheet(wb, GSA.list$positive, sheet = "Significant Gene Sets", startRow = 3, startCol = 3)
-        }
+      if(!is.na(GSA.list$positive[1])){
+        createSheet(wb, name = "Significant Positive Gene Sets")
+        writeWorksheet(wb, GSA.list$positive, sheet = "Significant Positive Gene Sets")            
       }
       
+      if(!is.na(GSA.list$negative[1])){
+        createSheet(wb, name = "Significant Negative Gene Sets")
+        writeWorksheet(wb, GSA.list$negative, sheet = "Significant Negative Gene Sets")      
+      }
+      
+      if(!is.null(GSAFullList)){
+        createSheet(wb, name = "Full Positive Gene Sets")
+        writeWorksheet(wb, GSAFullList$positive, sheet = "Full Positive Gene Sets")
+      }
+      
+      if(!is.null(GSAFullList)){
+        createSheet(wb, name = "Full Negative Gene Sets")
+        writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
+      }
+            
       saveWorkbook(wb)
       file.rename(fname, file)
-     # if
-    #        > createName(wb, name = "womenName", formula = "womenData!$C$5", overwrite = TRUE)
-    #  > writeNamedRegion(wb, women, name = "womenName")
-    #  > saveWorkbook(wb)
-      
         
-      
-   #   if(!is.na(GSA.list$negative[1])){
-  #      data$negative = GSA.list$negative      
-  #      dataname = c(dataname, "Significant Negative Gene Sets")    
-   #   }
-      
-  #    if(!is.null(GSAFullList)){
-  #      data$fullPositive = GSAFullList$positive
-   #     dataname = c(dataname, "Full Positive Gene Sets")
-   #   }
-      
-  #    if(!is.null(GSAFullList)){
-   #     data$fullNegative = GSAFullList$negative
-  #      dataname = c(dataname, "Full Negative Gene Sets")
-   #   }
-      
-      
   #    writeWorksheetToFile(fname, data = data, sheet = dataname)
   #    file.rename(fname, file)
       
