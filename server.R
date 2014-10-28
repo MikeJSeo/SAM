@@ -582,5 +582,47 @@ shinyServer(function(input, output) {
 
       }
     )
+  
+  #download button for gene set data
+  output$downloadData2 <- downloadHandler(
+    filename = function() { "result.xlsx" },
+    content = function(file) {
+      
+      
+      GSA.list = getGSAList()
+      GSAFullList = getGSAFullList()
+      
+      fname = paste(file, "xlsx", sep = ".")
+      data = list()
+      dataname = c()
+      
+      if(!is.na(GSA.list$positive[1])){
+        data$positive = GSA.list$positive
+        dataname = c(dataname, "Positive Gene Sets")
+      }    
+      
+      if(!is.na(GSA.list$negative[1])){
+        data$negative = GSA.list$negative      
+        dataname = c(dataname, "Negative Gene Sets")    
+      }
+      
+      if(!is.null(GSAFullList)){
+        data$fullPositive = GSAFullList$positive
+        dummyname = paste("Positive Gene Sets (", GSAFullList$nsets.pos, ")", sep = "")      
+        dataname = c(dataname, dummyname)
+      }
+      
+      if(!is.null(GSAFullList)){
+        data$fullNegative = GSAFullList$negative
+        dummyname = paste("Negative Gene Sets (", GSAFullList$nsets.neg, ")", sep = "")      
+        dataname = c(dataname, dummyname)
+      }
+      
+      
+      writeWorksheetToFile(fname, data = data, sheet = dataname)
+      file.rename(fname, file)
+      
+    }
+  )
 
 })

@@ -51,8 +51,8 @@ shinyUI(fluidPage(
       
       conditionalPanel(condition = "input.fdrChoice == 'Manually Enter FDR'",
         numericInput("fdrInput", label = "FDR value", min = 0, max = 1, value = 0.5, step = 0.01)
-      )
-      
+      ),
+      downloadButton("downloadData2","Save Result as XLSX File")
     )
     ),
     
