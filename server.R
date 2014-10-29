@@ -546,7 +546,7 @@ shinyServer(function(input, output) {
       result = getResult()
       delta.table = result$delta.table
       samr.assess.samplesize.obj =  getSampleSize()
-      allgenes = getAllgenesTable()
+      Allgenes = getAllgenesTable()
       
       fname = paste(file, "xlsx", sep = ".")
       wb = loadWorkbook(fname, create = TRUE)
