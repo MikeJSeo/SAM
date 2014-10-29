@@ -548,35 +548,38 @@ shinyServer(function(input, output) {
       samr.assess.samplesize.obj =  getSampleSize()
       
       fname = paste(file, "xlsx", sep = ".")
-      data = list()
-      dataname = c()
+      wb = loadWorkbook(fname, create = TRUE)
     
-      if(!is.null(delta.table)){
-        data$delta.table = delta.table
-        dataname = c(dataname, "Delta Table")
+      if(!is.null(delta.table)){        
+        createSheet(wb, name = "Delta Table")
+        writeWorksheet(wb, delta.table, sheet = "Delta Table")            
       }
       if(!is.null(siggenes.table$genes.up)){
-        data$siggenes.table.genes.up = as.data.frame(siggenes.table$genes.up)
-        dataname = c(dataname, "Postivie Genes")
+        createSheet(wb, name = "Positive Genes")
+        writeWorksheet(wb, siggenes.table$genes.up, sheet = "Positive Genes")
       }
       if(!is.null(siggenes.table$genes.lo)){
-        data$siggenes.table.genes.lo = as.data.frame(siggenes.table$genes.lo)
-        dataname = c(dataname, "Negative Genes")
+        createSheet(wb, name = "Negative Genes")
+        writeWorksheet(wb, siggenes.table$genes.lo, sheet = "Negative Genes")
       }
-      if(!is.null(samr.assess.samplesize.obj)){
-        data$sampleTable1 = samr.assess.samplesize.obj$results[,,1]
-        data$sampleTable2 = samr.assess.samplesize.obj$results[,,2]
-        data$sampleTable3 = samr.assess.samplesize.obj$results[,,3]
-        data$sampleTable4 = samr.assess.samplesize.obj$results[,,4]
-        
+      if(!is.null(samr.assess.samplesize.obj)){        
         dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
         dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
         dataSample3 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[3] * samr.assess.samplesize.obj$n, sep = "")
         dataSample4 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "")
-        dataname = c(dataname, c(dataSample1, dataSample2, dataSample3, dataSample4))
+        
+        createSheet(wb, name = dataSample1)
+        createSheet(wb, name = dataSample2)
+        createSheet(wb, name = dataSample3)
+        createSheet(wb, name = dataSample4)
+        
+        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,1], sheet = dataSample1)
+        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,2], sheet = dataSample2)
+        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,3], sheet = dataSample3)
+        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,4], sheet = dataSample4)
       }
       
-      writeWorksheetToFile(fname, data = data, sheet = dataname)
+      saveWorkbook(wb)
       file.rename(fname, file)
 
       }
