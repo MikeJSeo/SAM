@@ -551,6 +551,10 @@ shinyServer(function(input, output) {
       fname = paste(file, "xlsx", sep = ".")
       wb = loadWorkbook(fname, create = TRUE)
     
+      samr.obj = result$samr.obj
+      delta = findDelta()
+      min.foldchange = input$min.foldchange
+      
       png(file = "SAMPlot.png")
       samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
       dev.off()
