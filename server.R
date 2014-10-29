@@ -566,9 +566,9 @@ shinyServer(function(input, output) {
       
       
       if(!is.null(samr.obj)){
-        createSheet(wb, name = "SAM Plot")
-        createName(wb, name = "SAM Plot", formula = "SAM Plot!$B$2")
-        addImage(wb, filename = "SAMPlot.png", name = "SAM Plot", originalSize = TRUE) 
+        createSheet(wb, name = "SAMPlot")
+        createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
+        addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
       }
             
       if(!is.null(delta.table)){        
@@ -595,9 +595,9 @@ shinyServer(function(input, output) {
       }
       
       if(!is.null(samr.assess.samplesize.obj)){
-        createSheet(wb, name = "Sample Size Plot")
-        createName(wb, name = "Sample Size Plot", formula = "Sample Size Plot!$B$2")
-        addImage(wb, filename = "samplePlot.png", name = "Sample Size Plot", originalSize = TRUE) 
+        createSheet(wb, name = "samplePlot")
+        createName(wb, name = "samplePlot", formula = "samplePlot!$B$2")
+        addImage(wb, filename = "samplePlot.png", name = "samplePlot", originalSize = TRUE) 
       }
       
       if(!is.null(samr.assess.samplesize.obj)){        
