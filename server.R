@@ -546,22 +546,44 @@ shinyServer(function(input, output) {
       result = getResult()
       delta.table = result$delta.table
       samr.assess.samplesize.obj =  getSampleSize()
+      allgenes = getAllgenesTable()
       
       fname = paste(file, "xlsx", sep = ".")
       wb = loadWorkbook(fname, create = TRUE)
     
+      png(file = "SAMPlot.png")
+      samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
+      dev.off()
+      
+      if(!is.null(GSA)){
+        createSheet(wb, name = "SAMPlot")
+        createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
+        addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
+      }
+            
       if(!is.null(delta.table)){        
         createSheet(wb, name = "Delta Table")
         writeWorksheet(wb, delta.table, sheet = "Delta Table")            
       }
       if(!is.null(siggenes.table$genes.up)){
-        createSheet(wb, name = "Positive Genes")
-        writeWorksheet(wb, siggenes.table$genes.up, sheet = "Positive Genes")
+        createSheet(wb, name = "Significant Positive Genes")
+        writeWorksheet(wb, siggenes.table$genes.up, sheet = "Significant Positive Genes")
       }
       if(!is.null(siggenes.table$genes.lo)){
-        createSheet(wb, name = "Negative Genes")
-        writeWorksheet(wb, siggenes.table$genes.lo, sheet = "Negative Genes")
+        createSheet(wb, name = "Significant Negative Genes")
+        writeWorksheet(wb, siggenes.table$genes.lo, sheet = "Significant Negative Genes")
       }
+      
+      if(!is.null(Allgenes$genes.up)){
+        createSheet(wb, name = "All Positive Genes")
+        writeWorksheet(wb, Allgenes$genes.up, sheet = "All Positive Genes")
+      }
+      
+      if(!is.null(Allgenes$genes.lo)){
+        createSheet(wb, name = "All Negative Genes")
+        writeWorksheet(wb, Allgenes$genes.lo, sheet = "All Negative Genes")
+      }
+      
       if(!is.null(samr.assess.samplesize.obj)){        
         dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
         dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
