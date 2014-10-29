@@ -559,7 +559,13 @@ shinyServer(function(input, output) {
       samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
       dev.off()
       
-      if(!is.null(GSA)){
+      samr.assess.samplesize.obj =  getSampleSize()
+      png(file = "samplePlot.png")
+      samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
+      dev.off()
+      
+      
+      if(!is.null(samr.obj)){
         createSheet(wb, name = "SAMPlot")
         createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
         addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
@@ -586,6 +592,12 @@ shinyServer(function(input, output) {
       if(!is.null(Allgenes$genes.lo)){
         createSheet(wb, name = "All Negative Genes")
         writeWorksheet(wb, Allgenes$genes.lo, sheet = "All Negative Genes")
+      }
+      
+      if(!is.null(samr.assess.samplesize.obj)){
+        createSheet(wb, name = "samplePlot")
+        createName(wb, name = "samplePlot", formula = "samplePlot!$B$2")
+        addImage(wb, filename = "samplePlot.png", name = "samplePlot", originalSize = TRUE) 
       }
       
       if(!is.null(samr.assess.samplesize.obj)){        
@@ -627,6 +639,7 @@ shinyServer(function(input, output) {
       png(file = "GSAPlot.png")
       GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
       dev.off()
+      
       
       if(!is.null(GSA)){
         createSheet(wb, name = "GSAPlot")
