@@ -1,4 +1,5 @@
 #file:///C:/Users/mike/Desktop/MAIN/Examples/
+options(shiny.maxRequestSize=10000*1024^2)
 
 library(XLConnect)
 library(samr)
@@ -378,8 +379,10 @@ shinyServer(function(input, output) {
     objFile = input$iFile
     if(!is.null(objFile)){
       wb = loadWorkbook(objFile$datapath)
-      sheets = getSheets(wb)
-      dat = readWorksheet(wb, sheets, header = FALSE)
+      
+      #read just first sheet of the file
+      dat = readWorksheet(wb, 1, header = FALSE)
+
       x = dat[-1, c(-1,-2)]
       
       x = as.matrix(x)
@@ -488,7 +491,6 @@ shinyServer(function(input, output) {
     result = getResult()
     delta.table = result$delta.table
     delta.table
-  
   })
   
   output$Allgenes.table.up = renderDataTable({
@@ -539,138 +541,180 @@ shinyServer(function(input, output) {
     }
   })
 
-  output$downloadData <- downloadHandler(
-    filename = function() { "result.xlsx" },
-    content = function(file) {
-      siggenes.table = getSiggenesTable()
-      result = getResult()
-      delta.table = result$delta.table
-      samr.assess.samplesize.obj =  getSampleSize()
-      Allgenes = getAllgenesTable()
+  savethis = observe({
+  
+    if(input$saveButton != 0){
       
-      fname = paste(file, "xlsx", sep = ".")
-      wb = loadWorkbook(fname, create = TRUE)
+    isolate({  
     
-      samr.obj = result$samr.obj
-      delta = findDelta()
-      min.foldchange = input$min.foldchange
-      
+    dir = input$dir
+    file = input$fname
+    
+    siggenes.table = getSiggenesTable()
+    result = getResult()
+    delta.table = result$delta.table
+    samr.assess.samplesize.obj =  getSampleSize()
+    Allgenes = getAllgenesTable()
+    
+    samr.obj = result$samr.obj
+    delta = findDelta()
+    min.foldchange = input$min.foldchange
+    
+    fname = paste(file, "xlsx", sep = ".")
+    
+    if(file.exists(file.path(dir, fname))){
+      file.remove(file.path(dir, fname))      
+    }
+    wb = loadWorkbook(file.path(dir,fname), create = TRUE)
+    
+    if(!is.null(samr.obj)){
       png(file = "SAMPlot.png")
       samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
-      dev.off()
-      
-      samr.assess.samplesize.obj =  getSampleSize()
-      png(file = "samplePlot.png")
-      samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
-      dev.off()
-      
-      
-      if(!is.null(samr.obj)){
-        createSheet(wb, name = "SAMPlot")
-        createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
-        addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
-      }
-            
-      if(!is.null(delta.table)){        
-        createSheet(wb, name = "Delta Table")
-        writeWorksheet(wb, delta.table, sheet = "Delta Table")            
-      }
-      if(!is.null(siggenes.table$genes.up)){
-        createSheet(wb, name = "Significant Positive Genes")
-        writeWorksheet(wb, siggenes.table$genes.up, sheet = "Significant Positive Genes")
-      }
-      if(!is.null(siggenes.table$genes.lo)){
-        createSheet(wb, name = "Significant Negative Genes")
-        writeWorksheet(wb, siggenes.table$genes.lo, sheet = "Significant Negative Genes")
-      }
-      
-      if(!is.null(Allgenes$genes.up)){
-        createSheet(wb, name = "All Positive Genes")
-        writeWorksheet(wb, Allgenes$genes.up, sheet = "All Positive Genes")
-      }
-      
-      if(!is.null(Allgenes$genes.lo)){
-        createSheet(wb, name = "All Negative Genes")
-        writeWorksheet(wb, Allgenes$genes.lo, sheet = "All Negative Genes")
-      }
-      
-      if(!is.null(samr.assess.samplesize.obj)){
-        createSheet(wb, name = "samplePlot")
-        createName(wb, name = "samplePlot", formula = "samplePlot!$B$2")
-        addImage(wb, filename = "samplePlot.png", name = "samplePlot", originalSize = TRUE) 
-      }
-      
-      if(!is.null(samr.assess.samplesize.obj)){        
-        dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
-        dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
-        dataSample3 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[3] * samr.assess.samplesize.obj$n, sep = "")
-        dataSample4 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "")
-        
-        createSheet(wb, name = dataSample1)
-        createSheet(wb, name = dataSample2)
-        createSheet(wb, name = dataSample3)
-        createSheet(wb, name = dataSample4)
-        
-        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,1], sheet = dataSample1)
-        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,2], sheet = dataSample2)
-        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,3], sheet = dataSample3)
-        writeWorksheet(wb, samr.assess.samplesize.obj$results[,,4], sheet = dataSample4)
-      }
-      
-      saveWorkbook(wb)
-      file.rename(fname, file)
-
-      }
-    )
-  
-  #download button for gene set data
-  output$downloadData2 <- downloadHandler(
-    filename = function() { "result.xlsx" },
-    content = function(file) {
-      
-      GSA = getGSA()
-      GSA.obj = GSA$GSA.obj
-      GSA.list = getGSAList()
-      GSAFullList = getGSAFullList()
-      
-      fname = paste(file, "xlsx", sep = ".")
-      wb = loadWorkbook(fname, create = TRUE)
-      
-      png(file = "GSAPlot.png")
-      GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
-      dev.off()
-      
-      
-      if(!is.null(GSA)){
-        createSheet(wb, name = "GSAPlot")
-        createName(wb, name = "GSAPlot", formula = "GSAPlot!$B$2")
-        addImage(wb, filename = "GSAPlot.png", name = "GSAPlot", originalSize = TRUE) 
-      }
-      
-      if(!is.na(GSA.list$positive[1])){
-        createSheet(wb, name = "Significant Positive Gene Sets")
-        writeWorksheet(wb, GSA.list$positive, sheet = "Significant Positive Gene Sets")            
-      }
-      
-      if(!is.na(GSA.list$negative[1])){
-        createSheet(wb, name = "Significant Negative Gene Sets")
-        writeWorksheet(wb, GSA.list$negative, sheet = "Significant Negative Gene Sets")      
-      }
-      
-      if(!is.null(GSAFullList)){
-        createSheet(wb, name = "Full Positive Gene Sets")
-        writeWorksheet(wb, GSAFullList$positive, sheet = "Full Positive Gene Sets")
-      }
-      
-      if(!is.null(GSAFullList)){
-        createSheet(wb, name = "Full Negative Gene Sets")
-        writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
-      }
-      
-      saveWorkbook(wb)
-      file.rename(fname, file)
-      
+      dev.off()      
     }
-  )
+    
+    samr.assess.samplesize.obj =  getSampleSize()
+    if(!is.null(samr.assess.samplesize.obj)){
+      png(file = "samplesizePlot.png")
+      samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
+      dev.off()  
+    }
+    
+    if(!is.null(samr.obj)){      
+      createSheet(wb, name = "SAMPlot")
+      createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
+      addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
+      if (file.exists("SAMPlot.png")) file.remove("SAMPlot.png")
+    }
+    
+    if(!is.null(delta.table)){        
+      createSheet(wb, name = "Delta Table")
+      writeWorksheet(wb, delta.table, sheet = "Delta Table")    
+    }
+    
+    if(!is.null(delta.table)){        
+      createSheet(wb, name = "Delta Table")
+      writeWorksheet(wb, delta.table, sheet = "Delta Table")            
+    }
+    if(!is.null(siggenes.table$genes.up)){
+      createSheet(wb, name = "Significant Positive Genes")
+      writeWorksheet(wb, siggenes.table$genes.up, sheet = "Significant Positive Genes")
+    }
+    if(!is.null(siggenes.table$genes.lo)){
+      createSheet(wb, name = "Significant Negative Genes")
+      writeWorksheet(wb, siggenes.table$genes.lo, sheet = "Significant Negative Genes")
+    }
+    
+    if(!is.null(Allgenes$genes.up)){
+      createSheet(wb, name = "All Positive Genes")
+      writeWorksheet(wb, Allgenes$genes.up, sheet = "All Positive Genes")
+    }
+    
+    if(!is.null(Allgenes$genes.lo)){
+      createSheet(wb, name = "All Negative Genes")
+      writeWorksheet(wb, Allgenes$genes.lo, sheet = "All Negative Genes")
+    }
+  
+    if(!is.null(samr.assess.samplesize.obj)){
+      createSheet(wb, name = "sampleSizePlot")
+      createName(wb, name = "sampleSizePlot", formula = "sampleSizePlot!$B$2")
+      addImage(wb, filename = "samplesizePlot.png", name = "sampleSizePlot", originalSize = TRUE) 
+      if (file.exists("samplesizePlot.png")) file.remove("samplesizePlot.png")
+    }
+    
+    if(!is.null(samr.assess.samplesize.obj)){        
+      dataSample1 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[1] * samr.assess.samplesize.obj$n, sep = "")
+      dataSample2 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[2] * samr.assess.samplesize.obj$n, sep = "")
+      dataSample3 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[3] * samr.assess.samplesize.obj$n, sep = "")
+      dataSample4 = paste("Sample Size = ", samr.assess.samplesize.obj$samplesize.factor[4] * samr.assess.samplesize.obj$n, sep = "")
+      
+      createSheet(wb, name = dataSample1)
+      createSheet(wb, name = dataSample2)
+      createSheet(wb, name = dataSample3)
+      createSheet(wb, name = dataSample4)
+      
+      writeWorksheet(wb, samr.assess.samplesize.obj$results[,,1], sheet = dataSample1)
+      writeWorksheet(wb, samr.assess.samplesize.obj$results[,,2], sheet = dataSample2)
+      writeWorksheet(wb, samr.assess.samplesize.obj$results[,,3], sheet = dataSample3)
+      writeWorksheet(wb, samr.assess.samplesize.obj$results[,,4], sheet = dataSample4)
+    }
+    if(!is.null(result)){
+      saveWorkbook(wb, file.path(dir, fname))
+    # shell(file.path(dir, fname))
+    }
+    
+    
+    })
+    }
+      
+  })
+
+  
+  savethis2 = observe({
+    
+    if(input$saveButton2 != 0){
+      
+      isolate({  
+        
+        dir = input$dir2
+        file = input$fname2
+        
+        GSA = getGSA()
+        GSA.obj = GSA$GSA.obj
+        GSA.list = getGSAList()
+        GSAFullList = getGSAFullList()
+           
+        fname = paste(file, "xlsx", sep = ".")
+        
+        if(file.exists(file.path(dir, fname))){
+          file.remove(file.path(dir, fname))      
+        }
+        wb = loadWorkbook(file.path(dir,fname), create = TRUE)
+        
+        if(!is.null(GSA.obj)){
+          png(file = "GSAPlot.png")
+          GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
+          dev.off()    
+          
+        }
+        
+        if(!is.null(GSA)){
+          createSheet(wb, name = "GSAPlot")
+          createName(wb, name = "GSAPlot", formula = "GSAPlot!$B$2")
+          addImage(wb, filename = "GSAPlot.png", name = "GSAPlot", originalSize = TRUE) 
+          if (file.exists("GSAPlot.png")) file.remove("GSAPlot.png")
+        }
+        
+        if(!is.na(GSA.list$positive[1])){
+          createSheet(wb, name = "Significant Positive Gene Sets")
+          writeWorksheet(wb, GSA.list$positive, sheet = "Significant Positive Gene Sets")            
+        }
+        
+        if(!is.na(GSA.list$negative[1])){
+          createSheet(wb, name = "Significant Negative Gene Sets")
+          writeWorksheet(wb, GSA.list$negative, sheet = "Significant Negative Gene Sets")      
+        }
+        
+        if(!is.null(GSAFullList)){
+          createSheet(wb, name = "Full Positive Gene Sets")
+          writeWorksheet(wb, GSAFullList$positive, sheet = "Full Positive Gene Sets")
+        }
+        
+        if(!is.null(GSAFullList)){
+          createSheet(wb, name = "Full Negative Gene Sets")
+          writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
+        }
+        if(!is.null(GSA)){
+          saveWorkbook(wb, file.path(dir, fname))
+          # shell(file.path(dir, fname))
+        }
+        
+        
+      })
+    }
+    
+  })
+  
+  
 
 })
