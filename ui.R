@@ -36,8 +36,10 @@ shinyUI(fluidPage(
     
     radioButtons("localFDR", "Output local FDRs", c("No" = FALSE, "Yes" = TRUE)),
     
-    downloadButton("downloadData","Save Result as XLSX File")
-    
+    textInput("dir", "Paste the filepath to save the output", value = getwd()),
+    textInput("fname", "Type the file name you would like to save as", value = "result"),
+    actionButton("saveButton", "Save")   
+ 
     ),
     
     
@@ -52,7 +54,10 @@ shinyUI(fluidPage(
       conditionalPanel(condition = "input.fdrChoice == 'Manually Enter FDR'",
         numericInput("fdrInput", label = "FDR value", min = 0, max = 1, value = 0.5, step = 0.01)
       ),
-      downloadButton("downloadData2","Save Result as XLSX File")
+      textInput("dir2", "Paste the filepath to save the output", value = getwd()),
+      textInput("fname2", "Type the file name you would like to save as", value = "result"),
+      actionButton("saveButton2", "Save")   
+      
     )
     ),
     
