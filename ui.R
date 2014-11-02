@@ -10,8 +10,12 @@ shinyUI(fluidPage(
       
     fileInput(inputId = "iFile", label = "", accept="application/vnd.ms-excel"),
     uiOutput(outputId = "ui"),
-    actionButton("goButton", "Run"),
-    
+    conditionalPanel(condition = "input.analysisType == 'Standard'",
+      actionButton("goButton", "Run")
+    ),
+    conditionalPanel(condition = "input.analysisType == 'Gene sets'",
+      actionButton("goButton2", "Run")
+    ),
        
     conditionalPanel(condition = "input.goButton != 0 && input.analysisType == 'Standard'",
     
@@ -43,7 +47,7 @@ shinyUI(fluidPage(
     ),
     
     
-    conditionalPanel(condition = "input.goButton != 0 && input.analysisType == 'Gene sets'",
+    conditionalPanel(condition = "input.goButton2 != 0 && input.analysisType == 'Gene sets'",
       
       tags$hr(),                    
       radioButtons("fdrChoice", "FDR", c("FDR Slider" = "FDR Slider", "Manually Enter FDR" = "Manually Enter FDR")),
@@ -125,7 +129,7 @@ shinyUI(fluidPage(
         tabPanel("Significant Gene Set", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet")),
         tabPanel("Gene Score", h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
         tabPanel("All Gene Set",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet")),
-        tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), verbatimTextOutput("geneSetInfo"))
+        tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), tableOutput("geneSetTable"), h3(textOutput("geneSetInfoText2")), tableOutput("geneSetQuantile"), h3(textOutput("geneSetInfoText3")), tableOutput("geneSetTableGenes"))
         )      
     ),
     

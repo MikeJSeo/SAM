@@ -11,16 +11,37 @@ source("GSA.plot.revised.R")
 
 shinyServer(function(input, output) {  
   
-  output$geneSetInfo = renderPrint({
+  output$geneSetTable = renderTable({
     
     GSA = getGSA()
     if(!is.null(GSA)){      
       geneset.obj = GSA$geneset.obj
       genenames = GSA$genenames
-      GSA.correlate.revised(geneset.obj, genenames)
+      GSA.correlate.list = GSA.correlate.revised(geneset.obj, genenames)
+      GSA.correlate.list$result
     }
+  })
+  
+  output$geneSetQuantile = renderTable({
     
+    GSA = getGSA()
+    if(!is.null(GSA)){      
+      geneset.obj = GSA$geneset.obj
+      genenames = GSA$genenames
+      GSA.correlate.list = GSA.correlate.revised(geneset.obj, genenames)
+      GSA.correlate.list$QuantileCoverage
+    }
+  })
+  
+  output$geneSetTableGenes = renderTable({
     
+    GSA = getGSA()
+    if(!is.null(GSA)){      
+      geneset.obj = GSA$geneset.obj
+      genenames = GSA$genenames
+      GSA.correlate.list = GSA.correlate.revised(geneset.obj, genenames)
+      GSA.correlate.list$tableGenes
+    }
   })
   
   output$geneSetInfoText <- renderText({
@@ -28,6 +49,19 @@ shinyServer(function(input, output) {
       "Information for gene set collection"
     }
   })
+  
+  output$geneSetInfoText2 <- renderText({
+    if(!is.null(getGSAList())){
+      "Quantiles of fraction coverage of gene-sets"
+    }
+  })
+  
+  output$geneSetInfoText3 <- renderText({
+    if(!is.null(getGSAList())){
+      "Table of number of genes in genesets"
+    }
+  })
+  
   
   output$GSAPlotText <- renderText({
     if(!is.null(getGSAList())){
@@ -159,7 +193,7 @@ shinyServer(function(input, output) {
   
   getGSA = reactive({
     
-    input$goButton
+    input$goButton2
     
     isolate({
     
@@ -585,11 +619,6 @@ shinyServer(function(input, output) {
       createName(wb, name = "SAMPlot", formula = "SAMPlot!$B$2")
       addImage(wb, filename = "SAMPlot.png", name = "SAMPlot", originalSize = TRUE) 
       if (file.exists("SAMPlot.png")) file.remove("SAMPlot.png")
-    }
-    
-    if(!is.null(delta.table)){        
-      createSheet(wb, name = "Delta Table")
-      writeWorksheet(wb, delta.table, sheet = "Delta Table")    
     }
     
     if(!is.null(delta.table)){        
