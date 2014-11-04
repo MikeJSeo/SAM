@@ -108,7 +108,6 @@ shinyServer(function(input, output) {
     }
   })
   
-  
   output$geneSetPlot = renderPlot({
     
     GSA = getGSA()
@@ -131,7 +130,6 @@ shinyServer(function(input, output) {
   output$negativeGeneSet = renderTable({
     
     GSA.list = getGSAList()
-    
     if(!is.na(GSA.list$negative[1])){
       GSA.list$negative      
     }    
@@ -154,7 +152,6 @@ shinyServer(function(input, output) {
       GSAFullList$negative
     }    
   })
-  
   
   output$testGeneSet = renderTable({
     
@@ -188,7 +185,6 @@ shinyServer(function(input, output) {
       GSA.list = GSA.listsets.revised(GSA.obj, geneset.names = geneset.names, FDRcut = 1)
       GSA.list
     }
-    
   })
   
   getGSA = reactive({
@@ -417,6 +413,8 @@ shinyServer(function(input, output) {
       #read just first sheet of the file
       dat = readWorksheet(wb, 1, header = FALSE)
 
+      
+      
       x = dat[-1, c(-1,-2)]
       
       x = as.matrix(x)
