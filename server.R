@@ -146,16 +146,20 @@ shinyServer(function(input, output) {
     
     GSA.list = getGSAList()
     
-    if(!is.null(GSA.list$positive[1])){
-      GSA.list$positive
+    if(!is.null(GSA.list$positive)){
+      if(!is.na(GSA.list$positive[1])){
+        GSA.list$positive  
+      }
     }    
   })
   
   output$negativeGeneSet = renderTable({
     
     GSA.list = getGSAList()
-    if(!is.null(GSA.list$negative[1])){
-      GSA.list$negative      
+    if(!is.null(GSA.list$negative)){
+      if(!is.na(GSA.list$negative[1])){
+        GSA.list$negative  
+      }  
     }    
   })
   
