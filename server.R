@@ -10,8 +10,9 @@ source("GSA.correlate.revised.R")
 source("GSA.plot.revised.R")
 
 shinyServer(function(input, output) {  
+ 
   
-  output$geneSetTable = renderTable({
+  getGeneSetTable = reactive({
     
     GSA = getGSA()
     if(!is.null(GSA)){      
@@ -21,9 +22,15 @@ shinyServer(function(input, output) {
       GSA.correlate.list$result
     }
   })
-  
-  output$geneSetQuantile = renderTable({
-    
+
+  output$geneSetTable = renderTable({
+    geneSetTable = getGeneSetTable()
+    if(!is.null(geneSetTable)){
+      geneSetTable
+    }
+  })
+
+  getGeneSetQuantile = reactive({
     GSA = getGSA()
     if(!is.null(GSA)){      
       geneset.obj = GSA$geneset.obj
@@ -31,10 +38,18 @@ shinyServer(function(input, output) {
       GSA.correlate.list = GSA.correlate.revised(geneset.obj, genenames)
       GSA.correlate.list$QuantileCoverage
     }
+    
   })
   
-  output$geneSetTableGenes = renderTable({
+  output$geneSetQuantile = renderTable({
+    geneSetQuantile = getGeneSetQuantile()
+    if(!is.null(geneSetQuantile)){
+      geneSetQuantile
+    }
     
+  })
+  
+  getGeneSetTableGenes = reactive({
     GSA = getGSA()
     if(!is.null(GSA)){      
       geneset.obj = GSA$geneset.obj
@@ -42,6 +57,15 @@ shinyServer(function(input, output) {
       GSA.correlate.list = GSA.correlate.revised(geneset.obj, genenames)
       GSA.correlate.list$tableGenes
     }
+    
+  })
+  
+  output$geneSetTableGenes = renderTable({
+    geneSetTableGenes = getGeneSetTableGenes()
+    if(!is.null(geneSetTableGenes)){
+      geneSetTableGenes
+    }
+ 
   })
   
   output$geneSetInfoText <- renderText({
@@ -114,7 +138,7 @@ shinyServer(function(input, output) {
     
     if(!is.null(GSA)){
       GSA.obj = GSA$GSA.obj
-      GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
+      GSA.plot.revised(GSA.obj, FDRcut = 1, fac = 0)
     }
   })
   
@@ -122,7 +146,7 @@ shinyServer(function(input, output) {
     
     GSA.list = getGSAList()
     
-    if(!is.na(GSA.list$positive[1])){
+    if(!is.null(GSA.list$positive[1])){
       GSA.list$positive
     }    
   })
@@ -130,7 +154,7 @@ shinyServer(function(input, output) {
   output$negativeGeneSet = renderTable({
     
     GSA.list = getGSAList()
-    if(!is.na(GSA.list$negative[1])){
+    if(!is.null(GSA.list$negative[1])){
       GSA.list$negative      
     }    
   })
@@ -200,14 +224,19 @@ shinyServer(function(input, output) {
       
       x = data$x
       y = data$y
-      data = getData()
+      
+      class(y) = "numeric"
+      
       genenames = data$genenames
+      censoring.status = data$censoring.status
       
       geneset.obj = GSA.read.gmt(gmtFile$datapath)
       genesets = geneset.obj$genesets
       geneset.names = geneset.obj$geneset.names
       
-      GSA.obj = GSA(x,y, genenames=genenames, genesets=genesets, method = "maxmean", resp.type="Two class unpaired", nperms=100, minsize = input$minGeneSet, maxsize = input$maxGeneSet)
+      s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){NULL}else{input$s0.perc}   
+      
+      GSA.obj = GSA(x, y, genenames=genenames, genesets=genesets, method = "maxmean", resp.type= input$responseType_array, minsize = input$minGeneSet, maxsize = input$maxGeneSet, random.seed = input$random.seed, knn.neighbors = input$numberOfNeighbors, s0.perc = s0.perc, nperms = input$nperms, censoring.status = censoring.status)
       list(GSA.obj  = GSA.obj, geneset.names = geneset.names, genenames = genenames, genesets = genesets, geneset.obj = geneset.obj)
     }
     })
@@ -232,8 +261,6 @@ shinyServer(function(input, output) {
   })
   
   
-  
-  
   survival = function(firstrow){
     
     y = vector(length = length(firstrow), mode ="integer")
@@ -255,6 +282,34 @@ shinyServer(function(input, output) {
     list(y= y, censoring.status = censoring.status)
   }
   
+  output$missRateText = renderText({
+    if(!is.null(getResult())){
+      paste("Estimated Miss rates for Delta = ", findDelta())
+    }
+    
+  })
+  
+  output$eigengeneText = renderText({
+    if(!is.null(getResult()) && input$responseType_array == "Pattern discovery"){
+      "Eigengene"
+    }
+    
+  })
+  
+  getEigengene = reactive({
+    if(!is.null(getResult()) && input$responseType_array == "Pattern discovery"){
+      result = getResult()
+      samr.obj = result$samr.obj
+      samr.obj$eigengene
+    }
+  })
+  
+  output$eigengene = renderTable({
+    eigengene = getEigengene()
+    if(!is.null(eigengene)){
+      eigengene
+    }
+  })
   
   output$negativeGenesText <- renderText({
     
@@ -304,8 +359,29 @@ shinyServer(function(input, output) {
     }
   })
   
+  output$inputParametersText <- renderText({
+    if(!is.null(getResult())){
+      "Input Parameters"
+    }
+  })
+  output$computedValuesText <- renderText({
+    if(!is.null(getResult())){
+      "Computed Values"
+    }
+  })
   
-  output$sampleSizePlotText <- renderText({
+  output$inputParametersText2 <- renderText({
+    if(!is.null(getGSA())){
+      "Input Parameters"
+    }
+  })
+  output$computedValuesText2 <- renderText({
+    if(!is.null(getGSA())){
+      "Computed Values"
+    }
+  })
+  
+  output$sampleSizePlotText2 <- renderText({
     if(!is.null(getSampleSize())){
       "Sample Size Plot"
     }
@@ -359,17 +435,34 @@ shinyServer(function(input, output) {
     ar = isolate(input$responseType_array)
     seq = isolate(input$responseType_seq)
     
+    
     if(!is.null(getResult()) && ((input$assayType == "array" && (ar == "Two class unpaired" || ar == "Two class paired" || ar == "One class" || ar == "Survival")) || (input$assayType == "seq" && (seq == "Two class unpaired" || seq == "Two class paired" || seq == "Survival")))){
       
       result = getResult()
       samr.obj = result$samr.obj
       data = result$data
+      y = data$y
       dif = input$dif
-      samplesize.factors = input$sampleSizeFactors
-      samplesize.factors = as.numeric(unlist(strsplit(samplesize.factors, ",")))
-      samr.assess.samplesize.obj =  samr.assess.samplesize(samr.obj, data, dif, samplesize.factors)
-      samr.assess.samplesize.obj
+      if(!substring(y[1],2,6) %in% c("Block", "block")){
+        samplesize.factors = input$sampleSizeFactors
+        samplesize.factors = as.numeric(unlist(strsplit(samplesize.factors, ",")))
+        samr.assess.samplesize.obj =  samr.assess.samplesize(samr.obj, data, dif, samplesize.factors)
+        samr.assess.samplesize.obj
+      }
     }
+  })
+  
+  getMissRateTable = reactive({
+    if(!is.null(getResult())){
+      result = getResult()
+      delta = findDelta()
+      samr.obj = result$samr.obj
+      delta.table = result$delta.table
+      
+      missrate.table = samr.missrate(samr.obj, delta, delta.table)
+      missrate.table
+    }
+    
   })
   
   getSiggenesTable = reactive({
@@ -403,25 +496,42 @@ shinyServer(function(input, output) {
     }
   })
   
-  
   getData = reactive({
+    
     
     objFile = input$iFile
     if(!is.null(objFile)){
-      wb = loadWorkbook(objFile$datapath)
+    
+      ptn <- "\\.[[:alnum:]]{1,4}$"
+      Suf <- c(".txt", ".csv", ".xls", ".xlsx")
+      suf <- tolower(regmatches(objFile, regexpr(ptn, objFile)))
       
-      #read just first sheet of the file
-      dat = readWorksheet(wb, 1, header = FALSE)
-
-      
-      
-      x = dat[-1, c(-1,-2)]
-      
-      x = as.matrix(x)
-      class(x) = "numeric"
+      if(suf == ".xls" || suf == ".xlsx"){
+        wb = loadWorkbook(objFile$datapath)      
+        #read just first sheet of the file
+        dat = readWorksheet(wb, 1, header = FALSE)
+      }
+      if(suf == ".csv"){
+        dat = read.csv(objFile$datapath, header = FALSE)
+      }
       
       geneid = dat[-1,1]
       genenames = dat[-1,2]
+      
+      imputedX = NULL
+      x = dat[-1, c(-1,-2)]
+      x = as.matrix(x)
+      class(x) = "numeric"
+      if(sum(is.na(x)) > 0){
+        
+        imputedummy = impute.knn(x, k = input$numberOfNeighbors)
+        x = imputedummy$data
+        imputedX = cbind(geneid, genenames, x)
+        colnamesImputedX = as.vector(dat[1,])
+        colnamesImputedX[1] = " "
+        colnamesImputedX[2] = " "
+        colnames(imputedX) = colnamesImputedX
+      }
         
       firstrow = as.vector(dat[1,c(-1,-2)])
       censoring.status = NULL
@@ -441,16 +551,27 @@ shinyServer(function(input, output) {
       else{
         y = firstrow
       } 
+
         
-      data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number)        
+      data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number, imputedX = imputedX)        
       data
     }
     
   })
   
+  getImputedX = reactive({
+    
+    data = getData()
+    if(!is.null(data)){
+      imputedX = data$imputedX
+      imputedX
+    }
+  })
+  
   getResult = reactive({
     
     input$goButton
+    input$min.foldchange
     
     isolate({
     data = getData()
@@ -460,7 +581,7 @@ shinyServer(function(input, output) {
       s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){NULL}else{input$s0.perc}
       center.arrays = as.logical(input$centerArrays)
         
-      samr.obj = samr(data, resp.type = resp.type, assay.type = input$assayType, s0.perc = NULL, nperms = input$nperms, center.arrays = center.arrays, testStatistic = input$testStatistic, time.summary.type = input$timeSummaryType,  regression.method = input$regressionMethod, random.seed = input$random.seed)           
+      samr.obj = samr(data, resp.type = resp.type, assay.type = input$assayType, s0.perc = s0.perc, nperms = input$nperms, center.arrays = center.arrays, testStatistic = input$testStatistic, time.summary.type = input$timeSummaryType,  regression.method = input$regressionMethod, random.seed = input$random.seed, knn.neighbors = input$numberOfNeighbors)           
       delta.table = samr.compute.delta.table(samr.obj, min.foldchange = input$min.foldchange)
         
       list (data = data, samr.obj = samr.obj, delta.table = delta.table)  
@@ -469,7 +590,12 @@ shinyServer(function(input, output) {
     })
   })
 
-  
+  output$missRate = renderTable({
+    
+    if(!is.null(getMissRateTable())){
+      getMissRateTable()      
+    }
+  })
   output$sampleTable1 = renderTable({
     samr.assess.samplesize.obj =  getSampleSize()
     if(!is.null(samr.assess.samplesize.obj)){
@@ -572,7 +698,236 @@ shinyServer(function(input, output) {
       x
     }
   })
+  
+  capitalize = function(word){
+    letters = strsplit(word,'')
+    theletters = letters[[1]]
+    theletters[1] = toupper(theletters[1])
+    paste(theletters,collapse='')
+  }
+  
+  output$computedValues = renderTable({
+    if(!is.null(getComputedValues())){
+      getComputedValues()      
+    }
+    
+  })
+  
+  output$computedValues2 = renderTable({
+    if(!is.null(getComputedValues2())){
+      getComputedValues2()      
+    }
+    
+  })
+  
+  getComputedValues2 = reactive({
+    GSA = getGSA()
+    if(!is.null(GSA)){
+      GSA.obj = GSA$GSA.obj  
+      computedValues = matrix(NA, nrow = 2, ncol = 1)
+      colnames(computedValues) = "Values"
+      rownames(computedValues) = c("Exchangibility factor s0", "s0 percentile")
+        
+      computedValues[1,1] = GSA.obj$s0  
+      computedValues[2,1] = GSA.obj$s0.perc
+      computedValues
+    }
+    
+    
+  })
+  
+  getComputedValues= reactive({
+    
+    result = getResult()
+    if(!is.null(result)){
+      
+      computedValues = matrix(NA, nrow = 3, ncol = 1)
+      
+      colnames(computedValues) = "Values"
+      rownames(computedValues) = c("Estimated proportion of non-null features (genes)", "s0 percentile", "False Discovery Rate")
+      samr.obj = result$samr.obj
+      
+      computedValues[1,1] = samr.obj$pi0  
+      computedValues[2,1] = samr.obj$s0.perc
+      delta.table = samr.compute.delta.table(samr.obj, min.foldchange= input$min.foldchange, dels= findDelta())[5]
+      computedValues[3,1] = delta.table
+      
+      if(input$assayType == "array" && input$analysisType == "Standard" && input$responseType_array == "Multiclass"){
+        multiclassAdd = matrix(NA, nrow = 2, ncol = 1)
+        rownames(multiclassAdd) = c("2.5% null value for multiclass contrasts", "97.5% null value for multiclass contrasts")
+        multiclassAdd[1,1] = samr.obj$stand.contrasts.95[1]
+        multiclassAdd[2,1] = samr.obj$stand.contrasts.95[2]
+        computedValues = rbind(computedValues, multiclassAdd)
+      }
+      
+      if(input$assayType == "seq"){
+        depth = samr.obj$depth
+        seqAdd = matrix(NA, nrow = 1, ncol = 1)
+        rownames(seqAdd) = "Quantiles of estimated sequencing depths (0%, 25%, 50%, 75%, 100%)"   
+        seqAdd[1,1] = paste(quantile(depth, 0)[[1]], quantile(depth, 0.25)[[1]], quantile(depth, 0.5)[[1]], quantile(depth, 0.75)[[1]], quantile(depth, 1)[[1]],  sep = ", ")  
+        computedValues = rbind(computedValues, seqAdd)
+      }
+      computedValues
+      
+      
+    }
+    
+  })
+  
+  output$inputParameters = renderTable({
+    
+    if(!is.null(getInputParameters())){
+      getInputParameters()
+    }
+    
+  })
+  
+  output$inputParameters2 = renderTable({
+    
+    if(!is.null(getInputParameters2())){
+      getInputParameters2()
+    }
+    
+  })
+  
+  getInputParameters2 = reactive({
+    
+    input$goButton2
+    findFDR()
+        
+    isolate({
+      
+      if(input$goButton2!= 0){
+        current = matrix(NA, nrow = 10, ncol = 1)
+        
+        objFile = input$iFile
+        gmtFile = input$gmtFile  
+        s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
+        
+        current[1,1] = objFile$name
+        current[2,1] = gmtFile$name
+        current[3,1] = input$responseType_array
+        current[4,1] = findFDR()
+        current[5,1] = input$nperms
+        current[6,1] = s0.perc
+        current[7,1] = input$numberOfNeighbors
+        current[8,1] = input$minGeneSet
+        current[9,1] = input$maxGeneSet
+        current[10,1] = input$random.seed
+             
+        rownames_current = c("File Name", "Gene set (gmt) file", "Data Type", "False discovery rate (in each tail)", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Minimum gene set size", "Maximum gene set size", "Seed for Random number generator")  
+        
+        rownames(current) = rownames_current
+        colnames(current) = "value"
+        current
+      }
+        
+    })
+  })
+  
+  getInputParameters = reactive({
+    
+    input$goButton
+    findDelta()
+    input$min.foldchange
+    
+    isolate({
+    
+    if(input$goButton!= 0){
+        
+      
+    if(input$assayType == "array"){
+      current = matrix(NA, nrow = 14, ncol = 1)
+      
+      objFile = input$iFile
+      s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
+      
+      current[1,1] = objFile$name
+      current[2,1] = input$responseType_array
+      current[3,1] = capitalize(input$assayType)
+      current[4,1] = input$centerArrays
+      current[5,1] = findDelta()
+      current[6,1] = input$min.foldchange
+      current[7,1] = capitalize(input$testStatistic)
+      current[8,1] = capitalize(input$regressionMethod)
+      current[9,1] = input$dataLogged 
+      current[10,1] = input$nperms
+      current[11,1] = s0.perc
+      current[12,1] = input$numberOfNeighbors
+      current[13,1] = input$random.seed
+      current[14,1] = capitalize(input$timeSummaryType)
+      
+      rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Test statistic", "Regression method", "Are data are log scale?", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Seed for Random number generator", "Time summary type")  
+      
+      if(input$responseType_array == "Quantitative"){
+        current = matrix(current[c(-6, -7, -9, -14),], ncol = 1)
+        rownames_current = rownames_current[c(-6,-7, -9, -14)]
+      }
+      else if(input$responseType_array == "Two class unpaired"){
+        current = matrix(current[c(-8, -14),], ncol = 1)
+        rownames_current = rownames_current[c(-8, -14)]
+      }
+      else if(input$responseType_array == "Survival"){
+        current = matrix(current[c(-7,-8,-9,-14),], ncol = 1)
+        rownames_current = rownames_current[c(-7,-8,-9, -14)]
+      }
+      else if(input$responseType_array == "Multiclass" || input$responseType_array == "One class" || input$responseType_array == "Pattern discovery"){
+        current = matrix(current[c(-6,-7,-8,-9,-14),], ncol = 1)
+        rownames_current = rownames_current[c(-6,-7,-8,-9, -14)]
+      }
+      else if(input$responseType_array == "Two class paired"){
+        current = matrix(current[c(-7,-8,-14),], ncol = 1)
+        rownames_current = rownames_current[c(-7,-8,-14)]
+      }
+      else if(input$responseType_array == "Two class unpaired timecourse"){
+        current = matrix(current[c(-6, -8, -9),], ncol = 1)
+        rownames_current = rownames_current[c(-6, -8, -9)]
+      }
+      else if(input$responseType_array == "Two class paired timecourse"){
+        current = matrix(current[c(-6, -7, -8, -9),], ncol = 1)
+        rownames_current = rownames_current[c(-6, -7, -8, -9)]
+      }
+      else if(input$responseType_array == "One class timecourse"){
+        current = matrix(current[c(-6, -7, -8, -9),], ncol = 1)
+        rownames_current = rownames_current[c(-6, -7, -8, -9)]
+      }
+      
+      rownames(current) = rownames_current
+      colnames(current) = "value"
+    }
+    
+    if(input$assayType == "seq"){
+      
+      current = matrix(NA, nrow = 9, ncol = 1)
+      
+      objFile = input$iFile
+      
+      current[1,1] = objFile$name
+      current[2,1] = input$responseType_seq
+      current[3,1] = capitalize(input$assayType)
+      current[4,1] = input$centerArrays
+      current[5,1] = findDelta()
+      current[6,1] = input$min.foldchange
+      current[7,1] = input$nperms
+      current[8,1] = input$numberOfNeighbors
+      current[9,1] = input$random.seed
+      
+      rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Number of permutations", "Number of neighbors for KNN", "Seed for Random number generator")  
 
+      if(input$responseType_seq == "Quantitative" || input$responseType_seq == "Survival" || input$responseType_seq == "Multiclass"){
+        current = matrix(current[c(-6),], ncol = 1)
+        rownames_current = rownames_current[c(-6)]
+      }
+      
+      rownames(current) = rownames_current
+      colnames(current) = "value"
+    }
+    
+    current
+    }
+    })
+  })
+  
   savethis = observe({
   
     if(input$saveButton != 0){
@@ -583,6 +938,7 @@ shinyServer(function(input, output) {
     file = input$fname
     
     siggenes.table = getSiggenesTable()
+    missrate.table = getMissRateTable()
     result = getResult()
     delta.table = result$delta.table
     samr.assess.samplesize.obj =  getSampleSize()
@@ -591,6 +947,11 @@ shinyServer(function(input, output) {
     samr.obj = result$samr.obj
     delta = findDelta()
     min.foldchange = input$min.foldchange
+    
+    inputParameters = getInputParameters()
+    computedValues = getComputedValues()
+    eigengene = getEigengene()
+    imputedX = getImputedX()
     
     fname = paste(file, "xlsx", sep = ".")
     
@@ -623,6 +984,12 @@ shinyServer(function(input, output) {
       createSheet(wb, name = "Delta Table")
       writeWorksheet(wb, delta.table, sheet = "Delta Table")            
     }
+    
+    if(!is.null(missrate.table)){
+      createSheet(wb, name = "Miss Rate Table")
+      writeWorksheet(wb, missrate.table, sheet = "Miss Rate Table")      
+    }
+    
     if(!is.null(siggenes.table$genes.up)){
       createSheet(wb, name = "Significant Positive Genes")
       writeWorksheet(wb, siggenes.table$genes.up, sheet = "Significant Positive Genes")
@@ -665,6 +1032,33 @@ shinyServer(function(input, output) {
       writeWorksheet(wb, samr.assess.samplesize.obj$results[,,3], sheet = dataSample3)
       writeWorksheet(wb, samr.assess.samplesize.obj$results[,,4], sheet = dataSample4)
     }
+    
+    if(!is.null(inputParameters)){
+      createSheet(wb, name = "Input Parameters")
+      newInputParameters = cbind(rownames(inputParameters), inputParameters)
+      colnames(newInputParameters) = c("Questions","values")
+      writeWorksheet(wb, newInputParameters, sheet = "Input Parameters")
+    }
+    
+    if(!is.null(eigengene)){
+      createSheet(wb, name = "Eigengene")
+      writeWorksheet(wb, eigengene, sheet = "Eigengene")
+    }
+    
+    if(!is.null(imputedX)){
+      createSheet(wb, name = "Imputed Data")
+      writeWorksheet(wb, imputedX, sheet = "Imputed Data")
+    }
+    
+    if(!is.null(computedValues)){
+      createSheet(wb, name = "Computed Values")
+      newComputedValues = cbind(rownames(computedValues), computedValues)
+      colnames(newComputedValues) = c("Questions","values")
+      
+      writeWorksheet(wb, newComputedValues, sheet = "Computed Values")
+      
+    }
+    
     if(!is.null(result)){
       saveWorkbook(wb, file.path(dir, fname))
     # shell(file.path(dir, fname))
@@ -690,7 +1084,14 @@ shinyServer(function(input, output) {
         GSA.obj = GSA$GSA.obj
         GSA.list = getGSAList()
         GSAFullList = getGSAFullList()
-           
+        
+        geneSetTable = getGeneSetTable()
+        geneSetQuantile = getGeneSetQuantile()
+        geneSetTableGenes = getGeneSetTableGenes()
+        
+        inputParameters = getInputParameters2()
+        computedValues = getComputedValues2()
+        
         fname = paste(file, "xlsx", sep = ".")
         
         if(file.exists(file.path(dir, fname))){
@@ -700,9 +1101,8 @@ shinyServer(function(input, output) {
         
         if(!is.null(GSA.obj)){
           png(file = "GSAPlot.png")
-          GSA.plot.revised(GSA.obj, FDRcut = findFDR(), fac = 0)
+          GSA.plot.revised(GSA.obj, FDRcut = 1, fac = 0)
           dev.off()    
-          
         }
         
         if(!is.null(GSA)){
@@ -712,30 +1112,61 @@ shinyServer(function(input, output) {
           if (file.exists("GSAPlot.png")) file.remove("GSAPlot.png")
         }
         
-        if(!is.na(GSA.list$positive[1])){
+        if(!is.null(GSA.list$positive[1])){
           createSheet(wb, name = "Significant Positive Gene Sets")
           writeWorksheet(wb, GSA.list$positive, sheet = "Significant Positive Gene Sets")            
         }
-        
-        if(!is.na(GSA.list$negative[1])){
+
+        if(!is.null(GSA.list$negative[1])){
           createSheet(wb, name = "Significant Negative Gene Sets")
           writeWorksheet(wb, GSA.list$negative, sheet = "Significant Negative Gene Sets")      
         }
         
-        if(!is.null(GSAFullList)){
+        if(!is.null(GSAFullList$positive)){
           createSheet(wb, name = "Full Positive Gene Sets")
           writeWorksheet(wb, GSAFullList$positive, sheet = "Full Positive Gene Sets")
         }
         
-        if(!is.null(GSAFullList)){
+        if(!is.null(GSAFullList$negative)){
           createSheet(wb, name = "Full Negative Gene Sets")
           writeWorksheet(wb, GSAFullList$negative, sheet = "Full Negative Gene Sets")
         }
+        
+        if(!is.null(geneSetTable)){
+          createSheet(wb, name = "Gene set collection")
+          newGeneSetTable = cbind(rownames(geneSetTable), geneSetTable)
+          colnames(newGeneSetTable) = c("Questions","values")
+          writeWorksheet(wb, newGeneSetTable, sheet = "Gene set collection")          
+        }
+        if(!is.null(geneSetQuantile)){
+          createSheet(wb, name = "Quantiles of fraction coverage")
+          writeWorksheet(wb, geneSetQuantile, sheet = "Quantiles of fraction coverage")          
+        }
+        if(!is.null(geneSetTableGenes)){
+          createSheet(wb, name = "Number of genes")
+          writeWorksheet(wb, geneSetTableGenes, sheet = "Number of genes")                    
+        }
+        
+        if(!is.null(inputParameters)){
+          createSheet(wb, name = "Input Parameters")
+          newInputParameters = cbind(rownames(inputParameters), inputParameters)
+          colnames(newInputParameters) = c("Questions","values")
+          writeWorksheet(wb, newInputParameters, sheet = "Input Parameters")
+        }
+        
+        if(!is.null(computedValues)){
+          createSheet(wb, name = "Computed Values")
+          newComputedValues = cbind(rownames(computedValues), computedValues)
+          colnames(newComputedValues) = c("Questions","values")
+          
+          writeWorksheet(wb, newComputedValues, sheet = "Computed Values")
+          
+        }
+        
         if(!is.null(GSA)){
           saveWorkbook(wb, file.path(dir, fname))
           # shell(file.path(dir, fname))
         }
-        
         
       })
     }
