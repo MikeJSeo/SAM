@@ -29,7 +29,7 @@ shinyUI(fluidPage(
       numericInput("deltaInput", label = "Delta value", min = 0, max = 10, value = 0, step = 0.01)
     ),
     
-    conditionalPanel(condition = "(input.assayType == 'array' && (input.responseType_array == 'Two class unpaired' || input.responseType_array == 'Two class paired' )) || (input.assayType == 'seq' && (input.responseType_seq == 'Two class unpaired' || input.responseType_seq == 'Two class paired'))",
+    conditionalPanel(condition = "(input.assayType == 'array' && (input.responseType_array == 'Two class unpaired' || input.responseType_array == 'Two class paired' || input.responseType_array == 'Two class unpaired timecourse' || input.responseType_array == 'Two class paired timecourse')) || (input.assayType == 'seq' && (input.responseType_seq == 'Two class unpaired' || input.responseType_seq == 'Two class paired'))",
       numericInput("min.foldchange", label = "Minimum fold change", min = 1, value = 0, step = 0.01) 
     ),
     
@@ -126,21 +126,20 @@ shinyUI(fluidPage(
     conditionalPanel(condition = "input.analysisType == 'Gene sets'",
       tabsetPanel(id = 'gene set',
         tabPanel("GSA Plot", h3(textOutput("GSAPlotText")), plotOutput("geneSetPlot")),    
-        tabPanel("Significant Gene Set", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet"), h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
+        tabPanel("Significant Gene Set", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet")),
+        tabPanel("Gene Score", h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
         tabPanel("All Gene Set",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet")),
-        tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), tableOutput("geneSetTable"), h3(textOutput("geneSetInfoText2")), tableOutput("geneSetQuantile"), h3(textOutput("geneSetInfoText3")), tableOutput("geneSetTableGenes")),
-        tabPanel("Current Settings", h3(textOutput("inputParametersText2")), tableOutput("inputParameters2"), h3(textOutput("computedValuesText2")), tableOutput("computedValues2"))
+        tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), tableOutput("geneSetTable"), h3(textOutput("geneSetInfoText2")), tableOutput("geneSetQuantile"), h3(textOutput("geneSetInfoText3")), tableOutput("geneSetTableGenes"))
         )      
     ),
     
     conditionalPanel(condition = "input.analysisType == 'Standard'", 
       tabsetPanel(id='SAM',
         tabPanel("SAM Plot", h3(textOutput("samPlotText")), plotOutput("samrPlot")), 
-        tabPanel("Delta Table", h3(textOutput("deltaTableText")), tableOutput("deltaTable"), h3(textOutput("missRateText")), tableOutput("missRate")),
+        tabPanel("Delta Table", h3(textOutput("deltaTableText")), tableOutput("deltaTable")),
         tabPanel("Significant Genes", h3(textOutput("positiveGenesText")), dataTableOutput("siggenes.table.up"), h3(textOutput("negativeGenesText")), dataTableOutput("siggenes.table.lo")),
         tabPanel("All Genes", h3(textOutput("allPositiveGenesText")), dataTableOutput("Allgenes.table.up"), h3(textOutput("allNegativeGenesText")), dataTableOutput("Allgenes.table.lo")),
-        tabPanel("Sample Size", h3(textOutput("sampleSizePlotText")), plotOutput("samplePlot"),  h3(textOutput("sampleTableText1")), tableOutput("sampleTable1"), h3(textOutput("sampleTableText2")), tableOutput("sampleTable2"), h3(textOutput("sampleTableText3")), tableOutput("sampleTable3"), h3(textOutput("sampleTableText4")), tableOutput("sampleTable4")),
-        tabPanel("Current Settings", h3(textOutput("inputParametersText")), tableOutput("inputParameters"),  h3(textOutput("computedValuesText")), tableOutput("computedValues"), h3(textOutput("eigengeneText")), tableOutput("eigengene") )
+        tabPanel("Sample Size", h3(textOutput("sampleSizePlotText")), plotOutput("samplePlot"),  h3(textOutput("sampleTableText1")), tableOutput("sampleTable1"), h3(textOutput("sampleTableText2")), tableOutput("sampleTable2"), h3(textOutput("sampleTableText3")), tableOutput("sampleTable3"), h3(textOutput("sampleTableText4")), tableOutput("sampleTable4"))
       )
     )
     
