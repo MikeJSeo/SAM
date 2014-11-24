@@ -724,6 +724,14 @@ shinyServer(function(input, output) {
     
   })
   
+  getTailStrength = reactive({
+    result = getResult()
+    if(!is.null(result)){
+      samr.obj = result$samr.obj
+      samr.tail.strength(samr.obj)
+    }    
+  })
+  
   getComputedValues2 = reactive({
     GSA = getGSA()
     if(!is.null(GSA)){
@@ -745,16 +753,19 @@ shinyServer(function(input, output) {
     result = getResult()
     if(!is.null(result)){
       
-      computedValues = matrix(NA, nrow = 3, ncol = 1)
+      computedValues = matrix(NA, nrow = 5, ncol = 1)
       
       colnames(computedValues) = "Values"
-      rownames(computedValues) = c("Estimated proportion of non-null features (genes)", "s0 percentile", "False Discovery Rate")
+      rownames(computedValues) = c("Estimated proportion of non-null features (genes)", "s0 percentile", "False Discovery Rate", "Estimated tail strength", "Estimated standard error of tail strength")
       samr.obj = result$samr.obj
+      tail.strength = getTailStrength()
       
       computedValues[1,1] = samr.obj$pi0  
       computedValues[2,1] = samr.obj$s0.perc
       delta.table = samr.compute.delta.table(samr.obj, min.foldchange= input$min.foldchange, dels= findDelta())[5]
       computedValues[3,1] = delta.table
+      computedValues[4,1] = tail.strength$ts
+      computedValues[5,1] = tail.strength$se.ts
       
       if(input$assayType == "array" && input$analysisType == "Standard" && input$responseType_array == "Multiclass"){
         multiclassAdd = matrix(NA, nrow = 2, ncol = 1)
@@ -852,7 +863,7 @@ shinyServer(function(input, output) {
       current[4,1] = input$centerArrays
       current[5,1] = findDelta()
       current[6,1] = input$min.foldchange
-      current[7,1] = capitalize(input$testStatistic)
+      current[7,1] = if(input$testStatistic == "standard"){"T-statistic"} else{"Wilcoxon"}
       current[8,1] = capitalize(input$regressionMethod)
       current[9,1] = input$dataLogged 
       current[10,1] = input$nperms
@@ -872,8 +883,8 @@ shinyServer(function(input, output) {
         rownames_current = rownames_current[c(-8, -14)]
       }
       else if(input$responseType_array == "Survival"){
-        current = matrix(current[c(-7,-8,-9,-14),], ncol = 1)
-        rownames_current = rownames_current[c(-7,-8,-9, -14)]
+        current = matrix(current[c(-6, -7,-8,-9,-14),], ncol = 1)
+        rownames_current = rownames_current[c(-6, -7,-8,-9, -14)]
       }
       else if(input$responseType_array == "Multiclass" || input$responseType_array == "One class" || input$responseType_array == "Pattern discovery"){
         current = matrix(current[c(-6,-7,-8,-9,-14),], ncol = 1)
