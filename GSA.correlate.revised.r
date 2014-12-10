@@ -28,10 +28,10 @@ GSA.correlate.revised =function(GSA.genesets.obj, genenames){
   
   tableGenes = table(ngenes, dnn = "Table of number of genes in genesets")
   tableGenesN = length(names(tableGenes))
-  res2 = matrix(as.numeric(NA), 1, tableGenesN)
-  dimnames(res2) = list("count", names(tableGenes))
+  res2 = matrix(as.numeric(NA), tableGenesN, 1)
+  dimnames(res2) = list(names(tableGenes), "count")
   for(i in 1:tableGenesN){
-    res2[1,i] = tableGenes[[i]]
+    res2[i,1] = tableGenes[[i]]
   }
   tableGenes = res2
 #  cat(c("Quantiles of fraction coverage of gene-sets"),fill=T)

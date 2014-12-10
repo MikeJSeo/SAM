@@ -7,8 +7,8 @@ shinyUI(fluidPage(
   fluidRow(
     column(3, 
     wellPanel(
-      
-    fileInput(inputId = "iFile", label = "", accept="application/vnd.ms-excel"),
+    
+    fileInput(inputId = "iFile", label = "", accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),  
     uiOutput(outputId = "ui"),
     conditionalPanel(condition = "input.analysisType == 'Standard'",
       actionButton("goButton", "Run")
@@ -22,7 +22,7 @@ shinyUI(fluidPage(
     tags$hr(),                    
     radioButtons("deltaChoice", "Delta", c("Delta Slider" = "Delta Slider", "Manually Enter Delta" = "Manually Enter Delta")),
     conditionalPanel(condition = "input.deltaChoice == 'Delta Slider'",
-      sliderInput("deltaSlider", label = "Delta value", min = 0, max = 10, value = 0, step = 0.01)
+      uiOutput("slider")
     ),
     
     conditionalPanel(condition = "input.deltaChoice == 'Manually Enter Delta'",
@@ -126,8 +126,8 @@ shinyUI(fluidPage(
     conditionalPanel(condition = "input.analysisType == 'Gene sets'",
       tabsetPanel(id = 'gene set',
         tabPanel("GSA Plot", h3(textOutput("GSAPlotText")), plotOutput("geneSetPlot")),    
-        tabPanel("Significant Gene Set", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet"), h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
-        tabPanel("All Gene Set",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet")),
+        tabPanel("Significant Gene Sets", h3(textOutput("geneSetPositive")), tableOutput("positiveGeneSet"), h3(textOutput("geneSetNegative")), tableOutput("negativeGeneSet"), h3(textOutput("GeneScoreText")), numericInput("geneset.number", "geneset number", value= 1, step=1), tableOutput("testGeneSet")),
+        tabPanel("All Gene Sets",  h3(textOutput("geneSetFullPositive")), tableOutput("positiveFullGeneSet"), h3(textOutput("geneSetFullNegative")), tableOutput("negativeFullGeneSet")),
         tabPanel("Gene Set Collection Info", h3(textOutput("geneSetInfoText")), tableOutput("geneSetTable"), h3(textOutput("geneSetInfoText2")), tableOutput("geneSetQuantile"), h3(textOutput("geneSetInfoText3")), tableOutput("geneSetTableGenes")),
         tabPanel("Current Settings", h3(textOutput("inputParametersText2")), tableOutput("inputParameters2"), h3(textOutput("computedValuesText2")), tableOutput("computedValues2"))
         )      
