@@ -1189,7 +1189,13 @@ shinyServer(function(input, output) {
         if(!is.null(GSA)){
           fname = paste(file, "xlsx", sep = ".")
           saveWorkbook(wb, file.path(dir, fname), overwrite = TRUE)
-          shell(file.path(dir, fname))
+          
+          if(Sys.info()[['sysname']] == "Windows"){
+            shell(file.path(dir, fname))  
+          } else if(Sys.info()[['sysname']] == "Darwin"){
+            system(paste("open", fname))
+          }
+          
         }
         
       })
