@@ -945,7 +945,7 @@ shinyServer(function(input, output) {
       addStyle(wb, sheet = "Delta Table", titleStyle, rows = missraterow, cols = 1)
     }
     
-    if(!is.null(siggenes.table)){
+    if((siggenes.table$ngenes.up != 0) || (siggenes.table$ngenes.lo != 0)){
       addWorksheet(wb, sheetName = "Significant Genes")  
       setColWidths(wb, "Significant Genes", cols= 1:11, widths = 18)
     }
