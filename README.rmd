@@ -1,15 +1,27 @@
 # Web-enabled and Cross-platform SAM via Shiny
 
-To use the shiny version of SAM, first install required packages.
+___If you are running the Excel version of SAM, you should first try this on a different machine and not clobber
+the existing version of SAM. You've been warned.___
+
+To use the shiny version of SAM, first install required packages. Cut and paste what's below in an R session.
 
 ```{r}
-install.packages(c("GSA", "shiny", "openxlsx"))
+install.packages(c("samr", "matrixStats", "GSA", "shiny", "openxlsx"))
+source("http://bioconductor.org/biocLite.R")
+biocLite("impute")
 ```
 You only need to do this once.
 
-Then, run SAM as follows.
+Then, you may run SAM any time in an R session as follows.
 
 ```{r}
 library(shiny)
 runGithub("SAM", "MikeJSeo")
 ```
+
+That will bring up a browser window with a user interface. 
+
+Please post to the group regarding any issues. This will help us ensure we have all the kinks ironed out before merging the code 
+into the next version of the `samr` package.
+
+Thank you.
