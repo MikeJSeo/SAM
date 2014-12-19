@@ -26,6 +26,5 @@ That will bring up a browser window with a user interface. More details are prov
 Please post to the group regarding any issues. This will help us ensure we have all the kinks ironed out before merging the code 
 into the next version of the `samr` package.
 
-Thank you,
-
+Thank you,    
 Michael Seo
