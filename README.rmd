@@ -16,7 +16,7 @@ Then, you may run SAM any time in an R session as follows.
 
 ```{r}
 library(shiny)
-runGithub("SAM", "MikeJSeo")
+runGitHub("SAM", "MikeJSeo")
 ```
 
 That will bring up a browser window with a user interface. 
