@@ -3,7 +3,9 @@
 ___If you are running the Excel version of SAM, you should first try this on a different machine and not clobber
 the existing version of SAM. You've been warned.___
 
-To use the shiny version of SAM, first install required packages. Cut and paste what's below in an R session.
+First make sure you have a very recent version of R or RStudio.
+
+Next install required packages. Cut and paste what's below in an R session.
 
 ```{r}
 install.packages(c("samr", "matrixStats", "GSA", "shiny", "openxlsx"))
@@ -25,4 +27,5 @@ Please post to the group regarding any issues. This will help us ensure we have 
 into the next version of the `samr` package.
 
 Thank you,
+
 Michael Seo
