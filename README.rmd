@@ -1,0 +1,15 @@
+# Web-enabled and Cross-platform SAM via Shiny
+
+To use the shiny version of SAM, first install required packages.
+
+```{r}
+install.packages(c("GSA", "shiny", "openxlsx"))
+```
+You only need to do this once.
+
+Then, run SAM as follows.
+
+```{r}
+library(shiny)
+runGithub("SAM", "MikeJSeo")
+```
