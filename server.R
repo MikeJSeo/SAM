@@ -25,11 +25,17 @@ shinyServer(function(input, output) {
       genenames = dat[-1,2]
       
       imputedX = NULL
-      x = dat[-1, c(-1,-2)]
-      x = as.matrix(x)
+      x = as.matrix(dat[-1, c(-1,-2)])
       class(x) = "numeric"
-      if(sum(is.na(x)) > 0){
-        
+      
+      originalX = NULL
+      originalX = cbind(geneid, genenames, x)
+      colnamesOriginalX = as.vector(dat[1,])
+      colnamesOriginalX[1] = " "
+      colnamesOriginalX[2] = " "
+      colnames(originalX) = colnamesOriginalX
+      
+      if(sum(is.na(x)) > 0){  
         imputedummy = impute.knn(x, k = input$numberOfNeighbors)
         x = imputedummy$data
         imputedX = cbind(geneid, genenames, x)
@@ -58,8 +64,7 @@ shinyServer(function(input, output) {
         y = firstrow
       } 
       
-      
-      data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number, imputedX = imputedX)        
+      data =list(x=x,y=y, genenames=genenames, geneid=geneid, logged2= as.logical(input$dataLogged), censoring.status = censoring.status, eigengene.number = eigengene.number, imputedX = imputedX, originalX = originalX)        
       data
     }
   })
@@ -476,6 +481,15 @@ shinyServer(function(input, output) {
     imputedX = data$imputedX
     if(!is.null(imputedX)){
       imputedX
+    }
+  })
+  
+  getOriginalX = reactive({
+    
+    data = getData()
+    originalX = data$originalX
+    if(!is.null(originalX)){
+      originalX
     }
   })
   
@@ -907,11 +921,14 @@ shinyServer(function(input, output) {
     computedValues = getComputedValues()
     eigengene = getEigengene()
     imputedX = getImputedX()
+    originalX = getOriginalX()
     
     titleStyle = createStyle(fontSize = 14, fontColour = "#FFFFFF", halign = "center", fgFill = "#4F81BD")
     
     wb = createWorkbook()  
       
+    
+    
     if(!is.null(samr.obj)){
       png(file = "SAMPlot.png")
       samr.plot(samr.obj, delta, min.foldchange = min.foldchange)
@@ -922,6 +939,16 @@ shinyServer(function(input, output) {
       png(file = "samplesizePlot.png")
       samr.assess.samplesize.plot(samr.assess.samplesize.obj)  
       dev.off()  
+    }
+    
+    if(!is.null(originalX)){
+      addWorksheet(wb, sheetName = "Original Data")
+      writeData(wb, originalX, sheet = "Original Data")
+    }
+    
+    if(!is.null(imputedX)){
+      addWorksheet(wb, sheetName = "Imputed Data")
+      writeData(wb, imputedX, sheet = "Imputed Data")
     }
     
     if(!is.null(samr.obj)){      
@@ -1011,11 +1038,6 @@ shinyServer(function(input, output) {
       writeData(wb, sheet = "Sample Size", x = samr.assess.samplesize.obj$results[,,4], startRow = 66)
     }
     
-    if(!is.null(imputedX)){
-      addWorksheet(wb, sheetName = "Imputed Data")
-      writeData(wb, imputedX, sheet = "Imputed Data")
-    }
-    
     if(!is.null(inputParameters)){
       addWorksheet(wb, sheetName = "Current Settings")
       setColWidths(wb, "Current Settings", cols= 1, widths = 46)
@@ -1052,8 +1074,6 @@ shinyServer(function(input, output) {
       } else if(Sys.info()[['sysname']] == "Darwin"){
         system(paste("open", fname))
       }
-      
-    
           
     }
     
@@ -1086,6 +1106,9 @@ shinyServer(function(input, output) {
         inputParameters = getInputParameters2()
         computedValues = getComputedValues2()
         
+        originalX = getOriginalX()
+        imputedX = getImputedX()
+        
         titleStyle = createStyle(fontSize = 14, fontColour = "#FFFFFF", halign = "center", fgFill = "#4F81BD")
         
         wb = createWorkbook()  
@@ -1094,6 +1117,16 @@ shinyServer(function(input, output) {
           png(file = "GSAPlot.png")
           GSA.plot.revised(GSA.obj, FDRcut = 1, fac = 0)
           dev.off()    
+        }
+        
+        if(!is.null(originalX)){
+          addWorksheet(wb, sheetName = "Original Data")
+          writeData(wb, originalX, sheet = "Original Data")
+        }
+        
+        if(!is.null(imputedX)){
+          addWorksheet(wb, sheetName = "Imputed Data")
+          writeData(wb, imputedX, sheet = "Imputed Data")
         }
         
         if(!is.null(GSA)){
