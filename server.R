@@ -1,4 +1,3 @@
-#file:///C:/Users/mike/Desktop/MAIN/Examples/
 options(shiny.maxRequestSize=10000*1024^2)
 
 library(openxlsx)
@@ -1239,3 +1238,4 @@ shinyServer(function(input, output) {
   
 
 })
+
