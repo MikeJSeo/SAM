@@ -4,9 +4,9 @@ library(openxlsx)
 library(samr)
 library(GSA)
 
-source("GSA.listsets.revised.R")
-source("GSA.correlate.revised.R")
-source("GSA.plot.revised.R")
+source("/home/artem/projects/dimplom/tools/data/geo/experiment/SAM/GSA.listsets.revised.R")
+#source("/home/artem/projects/dimplom/tools/data/geo/experiment/SAM/GSA.correlate.revised.R")
+source("/home/artem/projects/dimplom/tools/data/geo/experiment/SAM/GSA.plot.revised.R")
 
 shinyServer(function(input, output) {  
  
