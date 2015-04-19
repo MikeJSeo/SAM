@@ -1112,26 +1112,26 @@ shinyServer(function(input, output) {
         
         wb = createWorkbook()  
         
-        if(!is.null(GSA.obj)){
-          png(file = "GSAPlot.png")
-          GSA.plot.revised(GSA.obj, FDRcut = 1, fac = 0)
-          dev.off()    
-        }
+        #if(!is.null(GSA.obj)){
+        #  png(file = "GSAPlot.png")
+        #  GSA.plot.revised(GSA.obj, FDRcut = 1, fac = 0)
+        #  dev.off()    
+        #}
         
-        if(!is.null(originalX)){
-          addWorksheet(wb, sheetName = "Original Data")
-          writeData(wb, originalX, sheet = "Original Data")
-        }
+        #if(!is.null(originalX)){
+        #  addWorksheet(wb, sheetName = "Original Data")
+        #  writeData(wb, originalX, sheet = "Original Data")
+        #}
         
-        if(!is.null(imputedX)){
-          addWorksheet(wb, sheetName = "Imputed Data")
-          writeData(wb, imputedX, sheet = "Imputed Data")
-        }
+        #if(!is.null(imputedX)){
+        #  addWorksheet(wb, sheetName = "Imputed Data")
+        #  writeData(wb, imputedX, sheet = "Imputed Data")
+        #}
         
-        if(!is.null(GSA)){
-          addWorksheet(wb, sheetName = "GSA Plot")
-          insertImage(wb, sheet = "GSA Plot", file = "GSAPlot.png", width = 5, height = 5)
-        }
+        #if(!is.null(GSA)){
+        #  addWorksheet(wb, sheetName = "GSA Plot")
+        #  insertImage(wb, sheet = "GSA Plot", file = "GSAPlot.png", width = 5, height = 5)
+        #}
         
         if(!is.null(GSA.list$positive[1]) || !is.null(GSA.list$negative[1])){
           addWorksheet(wb, sheetName = "Significant Gene Sets")
@@ -1153,70 +1153,70 @@ shinyServer(function(input, output) {
         }    
         
         
-        if(!is.null(GSAFullList$positive) || !is.null(GSAFullList$negative)){
-          addWorksheet(wb, sheetName = "Full Gene Sets")
-          setColWidths(wb, "Full Gene Sets", cols= 1:5, widths = 18)
-        }
+        #if(!is.null(GSAFullList$positive) || !is.null(GSAFullList$negative)){
+        #  addWorksheet(wb, sheetName = "Full Gene Sets")
+        #  setColWidths(wb, "Full Gene Sets", cols= 1:5, widths = 18)
+        #}
         
-        allgenerow = 1
-        if(!is.null(GSAFullList$positive)){
-          writeData(wb, sheet = "Full Gene Sets", x = "All Positive", startRow = allgenerow)
-          addStyle(wb, sheet = "Full Gene Sets", titleStyle, rows = allgenerow, cols = 1)
-          writeData(wb, sheet = "Full Gene Sets", x = GSAFullList$positive, startRow = allgenerow + 1)
-          allgenerow = GSAFullList$nsets.pos + 4
-        }
+        #allgenerow = 1
+        #if(!is.null(GSAFullList$positive)){
+        #  writeData(wb, sheet = "Full Gene Sets", x = "All Positive", startRow = allgenerow)
+        #  addStyle(wb, sheet = "Full Gene Sets", titleStyle, rows = allgenerow, cols = 1)
+        #  writeData(wb, sheet = "Full Gene Sets", x = GSAFullList$positive, startRow = allgenerow + 1)
+        #  allgenerow = GSAFullList$nsets.pos + 4
+        #}
         
-        if(!is.null(GSAFullList$negative)){
-          writeData(wb, sheet = "Full Gene Sets", x = "All Negative", startRow = allgenerow)
-          addStyle(wb, sheet = "Full Gene Sets", titleStyle, rows = allgenerow, cols = 1)
-          writeData(wb, sheet = "Full Gene Sets", x = GSAFullList$negative, startRow = allgenerow + 1)     
-        }
+        #if(!is.null(GSAFullList$negative)){
+        #  writeData(wb, sheet = "Full Gene Sets", x = "All Negative", startRow = allgenerow)
+        #  addStyle(wb, sheet = "Full Gene Sets", titleStyle, rows = allgenerow, cols = 1)
+        #  writeData(wb, sheet = "Full Gene Sets", x = GSAFullList$negative, startRow = allgenerow + 1)     
+        #}
         
-        if(!is.null(geneSetTable)){
-          addWorksheet(wb, sheetName = "Gene Set Collection")
-          setColWidths(wb, "Gene Set Collection", cols= 1:2, widths = 40)
+        #if(!is.null(geneSetTable)){
+        #  addWorksheet(wb, sheetName = "Gene Set Collection")
+        #  setColWidths(wb, "Gene Set Collection", cols= 1:2, widths = 40)
           
-          genesetinforow = 1
-          newGeneSetTable = cbind(rownames(geneSetTable), geneSetTable)
-          colnames(newGeneSetTable) = c("Questions","Values")
-          writeData(wb, sheet = "Gene Set Collection", x = "Information for gene set collection", startRow = genesetinforow)
-          addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
-          writeData(wb, sheet = "Gene Set Collection", x = newGeneSetTable, startRow = genesetinforow + 1)
-          genesetinforow = nrow(newGeneSetTable) + 4
+        #  genesetinforow = 1
+        #  newGeneSetTable = cbind(rownames(geneSetTable), geneSetTable)
+        #  colnames(newGeneSetTable) = c("Questions","Values")
+        #  writeData(wb, sheet = "Gene Set Collection", x = "Information for gene set collection", startRow = genesetinforow)
+        #  addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
+        #  writeData(wb, sheet = "Gene Set Collection", x = newGeneSetTable, startRow = genesetinforow + 1)
+        #  genesetinforow = nrow(newGeneSetTable) + 4
           
-          newGeneSetQuantile = cbind(colnames(geneSetQuantile), geneSetQuantile[1,])
-          colnames(newGeneSetQuantile) = c("Quantiles","Values")
-          writeData(wb, sheet = "Gene Set Collection", x = "Quantiles of fraction coverage", startRow = genesetinforow)
-          addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
-          writeData(wb, sheet = "Gene Set Collection", x = newGeneSetQuantile, startRow = genesetinforow + 1)
-          genesetinforow = genesetinforow + nrow(newGeneSetQuantile) + 3
+        #  newGeneSetQuantile = cbind(colnames(geneSetQuantile), geneSetQuantile[1,])
+        #  colnames(newGeneSetQuantile) = c("Quantiles","Values")
+        #  writeData(wb, sheet = "Gene Set Collection", x = "Quantiles of fraction coverage", startRow = genesetinforow)
+        #  addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
+        #  writeData(wb, sheet = "Gene Set Collection", x = newGeneSetQuantile, startRow = genesetinforow + 1)
+        #  genesetinforow = genesetinforow + nrow(newGeneSetQuantile) + 3
           
-          newGeneSetTableGenes = cbind(rownames(geneSetTableGenes), geneSetTableGenes)
-          colnames(newGeneSetTableGenes) = c("Number of genes in a set","count")
-          writeData(wb, sheet = "Gene Set Collection", x = "Number of genes", startRow = genesetinforow)
-          addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
-          writeData(wb, sheet = "Gene Set Collection", x = newGeneSetTableGenes, startRow = genesetinforow + 1)
-        }
+        #  newGeneSetTableGenes = cbind(rownames(geneSetTableGenes), geneSetTableGenes)
+        #  colnames(newGeneSetTableGenes) = c("Number of genes in a set","count")
+        #  writeData(wb, sheet = "Gene Set Collection", x = "Number of genes", startRow = genesetinforow)
+        #  addStyle(wb, sheet = "Gene Set Collection", titleStyle, rows = genesetinforow, cols = 1)
+        #  writeData(wb, sheet = "Gene Set Collection", x = newGeneSetTableGenes, startRow = genesetinforow + 1)
+        #}
 
-        if(!is.null(inputParameters)){
-          addWorksheet(wb, sheetName = "Current Settings")
-          setColWidths(wb, "Current Settings", cols= 1:2, widths = 40)
+        #if(!is.null(inputParameters)){
+        #  addWorksheet(wb, sheetName = "Current Settings")
+        #  setColWidths(wb, "Current Settings", cols= 1:2, widths = 40)
           
-          newInputParameters = cbind(rownames(inputParameters), inputParameters)
-          colnames(newInputParameters) = c("Questions","Values")
+        #  newInputParameters = cbind(rownames(inputParameters), inputParameters)
+        #  colnames(newInputParameters) = c("Questions","Values")
           
-          currentsettingsrow = 1
-          writeData(wb, sheet = "Current Settings", x = "Input Parameters", startRow = currentsettingsrow)
-          addStyle(wb, sheet = "Current Settings", titleStyle, rows = currentsettingsrow, cols = 1)
-          writeData(wb, sheet = "Current Settings", x = newInputParameters, startRow = currentsettingsrow + 1)
-          currentsettingsrow = nrow(newInputParameters) + 4
+        #  currentsettingsrow = 1
+        #  writeData(wb, sheet = "Current Settings", x = "Input Parameters", startRow = currentsettingsrow)
+        #  addStyle(wb, sheet = "Current Settings", titleStyle, rows = currentsettingsrow, cols = 1)
+        #  writeData(wb, sheet = "Current Settings", x = newInputParameters, startRow = currentsettingsrow + 1)
+        #  currentsettingsrow = nrow(newInputParameters) + 4
           
-          writeData(wb, sheet = "Current Settings", x = "Computed Values", startRow = currentsettingsrow)
-          addStyle(wb, sheet = "Current Settings", titleStyle, rows = currentsettingsrow, cols = 1)
-          newComputedValues = cbind(rownames(computedValues), computedValues)
-          colnames(newComputedValues) = c("Questions","Values")
-          writeData(wb, sheet = "Current Settings", x = newComputedValues, startRow = currentsettingsrow + 1)
-        }
+        #  writeData(wb, sheet = "Current Settings", x = "Computed Values", startRow = currentsettingsrow)
+        #  addStyle(wb, sheet = "Current Settings", titleStyle, rows = currentsettingsrow, cols = 1)
+        #  newComputedValues = cbind(rownames(computedValues), computedValues)
+        #  colnames(newComputedValues) = c("Questions","Values")
+        #  writeData(wb, sheet = "Current Settings", x = newComputedValues, startRow = currentsettingsrow + 1)
+        #}
 
         if(!is.null(GSA)){
           fname = paste(file, "xlsx", sep = ".")
