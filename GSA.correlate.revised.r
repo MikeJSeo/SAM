@@ -14,7 +14,7 @@ GSA.correlate.revised =function(GSA.genesets.obj, genenames){
   result[4,1] = length(genenames)
   result[5,1] = length(unique(genenames))
   result[6,1] = sum(!is.na(sets.in.exp))
-
+  
   nn=rep(NA,nsets)
   for(i in 1:nsets){
     nn[i]=sum(!is.na(match(GSA.genesets.obj$genesets[[i]],genenames)))
@@ -34,9 +34,9 @@ GSA.correlate.revised =function(GSA.genesets.obj, genenames){
     res2[i,1] = tableGenes[[i]]
   }
   tableGenes = res2
-#  cat(c("Quantiles of fraction coverage of gene-sets"),fill=T)
-#  print(quantile(nn/ngenes, seq(0,1,by=.1)),digits=4, fill = T)
-#  cat("", fill = T)
-#  table(ngenes, dnn = "Table of number of genes in genesets")
+  #  cat(c("Quantiles of fraction coverage of gene-sets"),fill=T)
+  #  print(quantile(nn/ngenes, seq(0,1,by=.1)),digits=4, fill = T)
+  #  cat("", fill = T)
+  #  table(ngenes, dnn = "Table of number of genes in genesets")
   list(result = result, QuantileCoverage = QuantileCoverage, tableGenes = tableGenes)
 }
