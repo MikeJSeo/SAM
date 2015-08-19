@@ -662,7 +662,7 @@ shinyServer(function(input, output) {
     
     delta.table = getDeltaTable()
     if(!is.null(delta.table)){
-      sliderInput("deltaSlider", label = "Delta value", min = 0, max = as.numeric(delta.table[50,1]), value = 0, step = 0.00001)  
+      sliderInput("deltaSlider", label = "Delta value", min = 0, max = round(as.numeric(delta.table[50,1]), 2), value = 0, step = 0.01)  
     }
     
   })
@@ -854,21 +854,27 @@ shinyServer(function(input, output) {
   output$Allgenes.table.up = renderDataTable({
     Allgenes = getAllgenesTable()      
     if(!is.null(Allgenes$genes.up)){
-      Allgenes$genes.up
+      genes.up = Allgenes$genes.up
+      genes.up[,4:7] = round(as.numeric(as.character(genes.up[,4:7])),4) 
+      genes.up
     }
   })
   
   output$Allgenes.table.lo = renderDataTable({
     Allgenes = getAllgenesTable()  
     if(!is.null(Allgenes$genes.lo)){
-      Allgenes$genes.lo
+      genes.lo = Allgenes$genes.lo
+      genes.lo[,4:7] = round(as.numeric(as.character(genes.lo[,4:7])),4) 
+      genes.lo
     }
   })
   
   output$siggenes.table.up <- renderDataTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.up)){
-      siggenes.table$genes.up
+      genes.up = siggenes.table$genes.up
+      genes.up[,4:7] = round(as.numeric(as.character(genes.up[,4:7])),4) 
+      genes.up
     }
   
   })
@@ -876,7 +882,9 @@ shinyServer(function(input, output) {
   output$siggenes.table.lo <- renderDataTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.lo)){     
-      siggenes.table$genes.lo
+      genes.lo = siggenes.table$genes.lo
+      genes.lo[,4:7] = round(as.numeric(as.character(genes.lo[,4:7])),4) 
+      genes.lo
     }
   })
   
