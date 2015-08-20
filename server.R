@@ -17,7 +17,7 @@ shinyServer(function(input, output, session) {
   observe({
     
     if (input$browse == 0) return()
-    updateTextInput(session, "iFile",  value = choose.files(default = system.file("inst/excel",package = "samr")))
+    updateTextInput(session, "iFile",  value = choose.files(default = system.file("excel",package = "samr")))
   })
   
   getData = reactive({
