@@ -8,8 +8,12 @@ shinyUI(fluidPage(
     column(3, 
     wellPanel(
     
-    fileInput(inputId = "iFile", label = "", accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),  
-    uiOutput(outputId = "ui"),
+    textInput("iFile", "File:", value = NA),
+    actionButton("browse", "Browse"),
+    br(),
+    br(),
+ #   fileInput(inputId = "iFile", label = "", accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),  
+ #   uiOutput(outputId = "ui"),
     conditionalPanel(condition = "input.analysisType == 'Standard'",
       actionButton("goButton", "Run")
     ),
