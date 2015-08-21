@@ -11,16 +11,14 @@ source("GSA.plot.revised.R")
 
 shinyServer(function(input, output, session) {  
  
-  volumes <- getVolumes() #c('R Installation'=R.home())
-  shinyFileChoose(input, 'file', roots= volumes, session=session)
+  roots = c(wd='.', examples =  system.file("excel",package="samr"))
+  shinyFileChoose(input, 'file', roots= roots, session=session)
   ##########Read uploaded data!
   
   getData = reactive({
-    
-    objFile = parseFilePaths(volumes, input$file)$datapath[1]
-    print(objFile)
+    objFile = parseFilePaths(roots, input$file)$datapath[1]
     if(!is.na(objFile)){
-   
+      
       dat = read.xlsx(as.character(objFile), 1, colNames = FALSE)   
       
       geneid = dat[-1,1]
@@ -181,11 +179,11 @@ shinyServer(function(input, output, session) {
       if(input$goButton2!= 0){
         current = matrix(NA, nrow = 10, ncol = 1)
         
-        objFile = input$iFile
+        objFile = parseFilePaths(roots, input$file)$datapath[1]
         gmtFile = input$gmtFile  
         s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
         
-        current[1,1] = objFile$name
+        current[1,1] = objFile
         current[2,1] = gmtFile$name
         current[3,1] = input$responseType_array
         current[4,1] = findFDR()
@@ -553,10 +551,10 @@ shinyServer(function(input, output, session) {
         if(input$assayType == "array"){
           current = matrix(NA, nrow = 14, ncol = 1)
           
-          objFile = input$iFile
+          objFile = parseFilePaths(roots, input$file)$datapath[1]
           s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
           
-          current[1,1] = objFile$name
+          current[1,1] = objFile
           current[2,1] = input$responseType_array
           current[3,1] = capitalize(input$assayType)
           current[4,1] = input$centerArrays
@@ -614,9 +612,9 @@ shinyServer(function(input, output, session) {
           
           current = matrix(NA, nrow = 9, ncol = 1)
           
-          objFile = input$iFile
+          objFile = parseFilePaths(roots, input$file)$datapath[1]
           
-          current[1,1] = objFile$name
+          current[1,1] = objFile
           current[2,1] = input$responseType_seq
           current[3,1] = capitalize(input$assayType)
           current[4,1] = input$centerArrays
