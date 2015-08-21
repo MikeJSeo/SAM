@@ -3,31 +3,25 @@ options(shiny.maxRequestSize=10000*1024^2)
 library(openxlsx)
 library(samr)
 library(GSA)
+library(shinyFiles)
 
 source("GSA.listsets.revised.R")
 source("GSA.correlate.revised.R")
 source("GSA.plot.revised.R")
 
-shinyServer(function(input, output) {  
+shinyServer(function(input, output, session) {  
  
-  
+  volumes <- getVolumes() #c('R Installation'=R.home())
+  shinyFileChoose(input, 'file', roots= volumes, session=session)
   ##########Read uploaded data!
   
-<<<<<<< HEAD
-=======
-  observe({
-    
-    if (input$browse == 0) return()
-    updateTextInput(session, "iFile",  value = choose.files(default = system.file("inst/excel",package = "samr")))
-  })
-  
->>>>>>> parent of 5ae414f... ssd
   getData = reactive({
     
-    objFile = input$iFile
-    if(!is.null(objFile)){
+    objFile = parseFilePaths(volumes, input$file)$datapath[1]
+    print(objFile)
+    if(!is.na(objFile)){
    
-      dat = read.xlsx(objFile$datapath, 1, colNames = FALSE)   
+      dat = read.xlsx(as.character(objFile), 1, colNames = FALSE)   
       
       geneid = dat[-1,1]
       genenames = dat[-1,2]
