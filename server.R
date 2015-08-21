@@ -13,6 +13,15 @@ shinyServer(function(input, output) {
   
   ##########Read uploaded data!
   
+<<<<<<< HEAD
+=======
+  observe({
+    
+    if (input$browse == 0) return()
+    updateTextInput(session, "iFile",  value = choose.files(default = system.file("inst/excel",package = "samr")))
+  })
+  
+>>>>>>> parent of 5ae414f... ssd
   getData = reactive({
     
     objFile = input$iFile
