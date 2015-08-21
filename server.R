@@ -3,6 +3,7 @@ options(shiny.maxRequestSize=10000*1024^2)
 library(openxlsx)
 library(samr)
 library(GSA)
+library(shiny)
 library(shinyFiles)
 
 source("GSA.listsets.revised.R")
@@ -180,10 +181,11 @@ shinyServer(function(input, output, session) {
         current = matrix(NA, nrow = 10, ncol = 1)
         
         objFile = parseFilePaths(roots, input$file)$datapath[1]
+        print(objFile)
         gmtFile = input$gmtFile  
         s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
         
-        current[1,1] = objFile
+        current[1,1] = as.character(objFile)
         current[2,1] = gmtFile$name
         current[3,1] = input$responseType_array
         current[4,1] = findFDR()
@@ -194,7 +196,7 @@ shinyServer(function(input, output, session) {
         current[9,1] = input$maxGeneSet
         current[10,1] = input$random.seed
         
-        rownames_current = c("File Name", "Gene set (gmt) file", "Data Type", "False discovery rate (in each tail)", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Minimum gene set size", "Maximum gene set size", "Seed for Random number generator")  
+        rownames_current = c("File Path", "Gene set (gmt) file", "Data Type", "False discovery rate (in each tail)", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Minimum gene set size", "Maximum gene set size", "Seed for Random number generator")  
         
         rownames(current) = rownames_current
         colnames(current) = "value"
@@ -552,9 +554,10 @@ shinyServer(function(input, output, session) {
           current = matrix(NA, nrow = 14, ncol = 1)
           
           objFile = parseFilePaths(roots, input$file)$datapath[1]
+          print(objFile)
           s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
           
-          current[1,1] = objFile
+          current[1,1] = as.character(objFile)
           current[2,1] = input$responseType_array
           current[3,1] = capitalize(input$assayType)
           current[4,1] = input$centerArrays
@@ -569,7 +572,7 @@ shinyServer(function(input, output, session) {
           current[13,1] = input$random.seed
           current[14,1] = capitalize(input$timeSummaryType)
           
-          rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Test statistic", "Regression method", "Are data are log scale?", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Seed for Random number generator", "Time summary type")  
+          rownames_current = c("File Path", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Test statistic", "Regression method", "Are data are log scale?", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Seed for Random number generator", "Time summary type")  
           
           if(input$responseType_array == "Quantitative"){
             current = matrix(current[c(-6, -7, -9, -14),], ncol = 1)
@@ -614,7 +617,7 @@ shinyServer(function(input, output, session) {
           
           objFile = parseFilePaths(roots, input$file)$datapath[1]
           
-          current[1,1] = objFile
+          current[1,1] = as.character(objFile)
           current[2,1] = input$responseType_seq
           current[3,1] = capitalize(input$assayType)
           current[4,1] = input$centerArrays
@@ -624,7 +627,7 @@ shinyServer(function(input, output, session) {
           current[8,1] = input$numberOfNeighbors
           current[9,1] = input$random.seed
           
-          rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Number of permutations", "Number of neighbors for KNN", "Seed for Random number generator")  
+          rownames_current = c("File Path", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Number of permutations", "Number of neighbors for KNN", "Seed for Random number generator")  
           
           if(input$responseType_seq == "Quantitative" || input$responseType_seq == "Survival" || input$responseType_seq == "Multiclass"){
             current = matrix(current[c(-6),], ncol = 1)
@@ -663,7 +666,7 @@ shinyServer(function(input, output, session) {
     
     delta.table = getDeltaTable()
     if(!is.null(delta.table)){
-      sliderInput("deltaSlider", label = "Delta value", min = 0, max = round(as.numeric(delta.table[50,1]), 2), value = 0, step = 0.01)  
+      sliderInput("deltaSlider", label = "Delta value", min = 0, max = round(as.numeric(delta.table[dim(delta.table)[1],1]), 2), value = 0, step = 0.01)  
     }
     
   })
