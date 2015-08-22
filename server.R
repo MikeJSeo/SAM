@@ -181,7 +181,6 @@ shinyServer(function(input, output, session) {
         current = matrix(NA, nrow = 10, ncol = 1)
         
         objFile = parseFilePaths(roots, input$file)$datapath[1]
-        print(objFile)
         gmtFile = input$gmtFile  
         s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
         
@@ -554,7 +553,6 @@ shinyServer(function(input, output, session) {
           current = matrix(NA, nrow = 14, ncol = 1)
           
           objFile = parseFilePaths(roots, input$file)$datapath[1]
-          print(objFile)
           s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
           
           current[1,1] = as.character(objFile)
