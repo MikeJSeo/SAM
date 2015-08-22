@@ -11,9 +11,9 @@ source("GSA.correlate.revised.R")
 source("GSA.plot.revised.R")
 
 shinyServer(function(input, output, session) {  
- 
-  roots = c(wd='.', examples =  system.file("excel",package="samr"))
-  shinyFileChoose(input, 'file', roots= roots, session=session)
+
+  roots = c(root='/', examples =  system.file("excel",package="samr"))
+  shinyFileChoose(input, 'file', roots= roots, session=session, filetypes = ".xlsx")
   ##########Read uploaded data!
   
   getData = reactive({
