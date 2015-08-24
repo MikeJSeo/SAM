@@ -15,6 +15,7 @@ Then, you may run SAM any time in an R session as follows.
 
 ```{r}
 library(shiny)
+library(shinyFiles)
 runGitHub("SAM", "MikeJSeo")
 ```
 
