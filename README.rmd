@@ -5,7 +5,7 @@ First make sure you have a very recent version of R or RStudio.
 Next install required packages. Cut and paste what's below in an R session.
 
 ```{r}
-install.packages(c("samr", "matrixStats", "GSA", "shiny", "openxlsx"))
+install.packages(c("samr", "matrixStats", "GSA", "shiny", "shinyFiles", "openxlsx"))
 source("http://bioconductor.org/biocLite.R")
 biocLite("impute")
 ```
@@ -22,6 +22,8 @@ That will bring up a browser window with a user interface. More details are prov
 
 Please post to the group regarding any issues. This will help us ensure we have all the kinks ironed out before merging the code 
 into the next version of the `samr` package.
+
+Note that users should use Firefox or Chrome as the _default_browser on Windows: IE will not work. 
 
 Thank you,    
 Michael Seo
