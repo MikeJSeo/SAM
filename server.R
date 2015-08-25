@@ -12,11 +12,12 @@ source("GSA.plot.revised.R")
 
 shinyServer(function(input, output, session) {  
 
-  roots = c(root='/', examples =  system.file("excel",package="samr"))
+  roots = c(root = getVolumes()(), examples =  system.file("excel", package="samr"))
   shinyFileChoose(input, 'file', roots= roots, session=session)
   ##########Read uploaded data!
   
   getData = reactive({
+    
     objFile = parseFilePaths(roots, input$file)$datapath[1]
     if(!is.na(objFile)){
       
