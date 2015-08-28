@@ -12,8 +12,16 @@ source("GSA.plot.revised.R")
 
 shinyServer(function(input, output, session) {  
 
-  roots = c(root = getVolumes()(), examples =  system.file("excel", package="samr"))
+  roots = c(examples =  system.file("excel", package="samr"), root = getVolumes()())
   shinyFileChoose(input, 'file', roots= roots, session=session)
+  
+  observe({
+    filename = basename(paste(parseFilePaths(roots, input$file)$datapath[1]))
+    if(filename != "NA")
+      updateTextInput(session, "FileName",  value = filename)
+  })
+
+  
   ##########Read uploaded data!
   
   getData = reactive({
@@ -98,9 +106,7 @@ shinyServer(function(input, output, session) {
   ######get results from GSA
   getGSA = reactive({
     
-    input$goButton2
-    
-    isolate({     
+    if(input$goButton2 != 0){   
       data = getData()
       gmtFile = input$gmtFile
       
@@ -123,7 +129,7 @@ shinyServer(function(input, output, session) {
         GSA.obj = GSA(x, y, genenames=genenames, genesets=genesets, method = "maxmean", resp.type= input$responseType_array, minsize = input$minGeneSet, maxsize = input$maxGeneSet, random.seed = input$random.seed, knn.neighbors = input$numberOfNeighbors, s0.perc = s0.perc, nperms = input$nperms, censoring.status = censoring.status)
         list(GSA.obj  = GSA.obj, geneset.names = geneset.names, genenames = genenames, genesets = genesets, geneset.obj = geneset.obj)
       }
-    })
+    }
   })
   
   getGSACorrelateList = reactive({
@@ -379,9 +385,9 @@ shinyServer(function(input, output, session) {
   ############get results from SAM
   getSamrObj = reactive({
 
-    input$goButton
+#   input$goButton
     
-    isolate({
+    if(input$goButton != 0){
       data = getData()
       
       if(!is.null(data)){
@@ -392,8 +398,7 @@ shinyServer(function(input, output, session) {
         samr.obj = samr(data, resp.type = resp.type, assay.type = input$assayType, s0.perc = s0.perc, nperms = input$nperms, center.arrays = center.arrays, testStatistic = input$testStatistic, time.summary.type = input$timeSummaryType,  regression.method = input$regressionMethod, random.seed = input$random.seed, knn.neighbors = input$numberOfNeighbors)           
         samr.obj
       }
-      
-    })
+    }
   })
   
   getDeltaTable = reactive({  

@@ -8,14 +8,21 @@ shinyUI(fluidPage(
     column(3, 
     wellPanel(
     
-    shinyFilesButton('file', 'File select', 'Please select a file', FALSE),
-    br(),
+    textInput("FileName", "File:", value = ""),
+    
+    tags$div(title="Click here to select data you would like to analyze",
+      shinyFilesButton('file', 'Select a File', 'Please select a file', FALSE)         
+    ),
     br(),
     conditionalPanel(condition = "input.analysisType == 'Standard'",
-      actionButton("goButton", "Run")
+      tags$div(title= "Specify the type of analysis from below, then press Run",
+        actionButton("goButton", "Run")         
+      )
     ),
     conditionalPanel(condition = "input.analysisType == 'Gene sets'",
-      actionButton("goButton2", "Run")
+      tags$div(title= "Specify the type of analysis from below, then press Run",
+        actionButton("goButton2", "Run")         
+      )      
     ),
        
     conditionalPanel(condition = "input.goButton != 0 && input.analysisType == 'Standard'",
@@ -118,11 +125,7 @@ shinyUI(fluidPage(
     ),
   
   
-  column(9, 
-#    tags$style(type="text/css",
-#               ".shiny-output-error { visibility: hidden; }",
-#               ".shiny-output-error:before { visibility: hidden; }"
-#    ),
+  column(9,
 
     conditionalPanel(condition = "input.analysisType == 'Gene sets'",
       tabsetPanel(id = 'gene set',
