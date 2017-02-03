@@ -12,21 +12,12 @@ source("GSA.plot.revised.R")
 
 shinyServer(function(input, output, session) {  
 
-  roots = c(examples =  system.file("excel", package="samr"), root = getVolumes()())
-  shinyFileChoose(input, 'file', roots= roots, session=session)
-  
-  observe({
-    filename = basename(paste(parseFilePaths(roots, input$file)$datapath[1]))
-    if(filename != "NA")
-      updateTextInput(session, "FileName",  value = filename)
-  })
-
-  
   ##########Read uploaded data!
+  
   
   getData = reactive({
     
-    objFile = parseFilePaths(roots, input$file)$datapath[1]
+    objFile = input$file$datapath
     if(!is.na(objFile)){
       
       dat = read.xlsx(as.character(objFile), 1, colNames = FALSE)   
@@ -172,7 +163,7 @@ shinyServer(function(input, output, session) {
       
       computedValues[1,1] = GSA.obj$s0  
       computedValues[2,1] = GSA.obj$s0.perc
-      computedValues
+      cbind(rownames(computedValues), computedValues)
     }
   })
   
@@ -187,7 +178,7 @@ shinyServer(function(input, output, session) {
       if(input$goButton2!= 0){
         current = matrix(NA, nrow = 10, ncol = 1)
         
-        objFile = parseFilePaths(roots, input$file)$datapath[1]
+        objFile = input$file$name
         gmtFile = input$gmtFile  
         s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
         
@@ -202,11 +193,12 @@ shinyServer(function(input, output, session) {
         current[9,1] = input$maxGeneSet
         current[10,1] = input$random.seed
         
-        rownames_current = c("File Path", "Gene set (gmt) file", "Data Type", "False discovery rate (in each tail)", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Minimum gene set size", "Maximum gene set size", "Seed for Random number generator")  
+        rownames_current = c("File Name", "Gene set (gmt) file", "Data Type", "False discovery rate (in each tail)", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Minimum gene set size", "Maximum gene set size", "Seed for Random number generator")  
         
         rownames(current) = rownames_current
         colnames(current) = "value"
-        current
+        
+        cbind(rownames_current, current)
       }
       
     })
@@ -533,7 +525,7 @@ shinyServer(function(input, output, session) {
         seqAdd[1,1] = paste(quantile(depth, 0)[[1]], quantile(depth, 0.25)[[1]], quantile(depth, 0.5)[[1]], quantile(depth, 0.75)[[1]], quantile(depth, 1)[[1]],  sep = ", ")  
         computedValues = rbind(computedValues, seqAdd)
       }
-      computedValues
+      cbind(name = rownames(computedValues), computedValues)
     }
   })
   
@@ -558,7 +550,7 @@ shinyServer(function(input, output, session) {
         if(input$assayType == "array"){
           current = matrix(NA, nrow = 14, ncol = 1)
           
-          objFile = parseFilePaths(roots, input$file)$datapath[1]
+          objFile = input$file$name
           s0.perc = if(is.na(input$s0.perc) || input$s0 == "Automatic"){"Automatic"}else{paste(input$s0.perc, " percentile")}
           
           current[1,1] = as.character(objFile)
@@ -576,7 +568,7 @@ shinyServer(function(input, output, session) {
           current[13,1] = input$random.seed
           current[14,1] = capitalize(input$timeSummaryType)
           
-          rownames_current = c("File Path", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Test statistic", "Regression method", "Are data are log scale?", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Seed for Random number generator", "Time summary type")  
+          rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Test statistic", "Regression method", "Are data are log scale?", "Number of permutations", "Input percentile for exchangeability factor s0", "Number of neighbors for KNN", "Seed for Random number generator", "Time summary type")  
           
           if(input$responseType_array == "Quantitative"){
             current = matrix(current[c(-6, -7, -9, -14),], ncol = 1)
@@ -613,13 +605,15 @@ shinyServer(function(input, output, session) {
           
           rownames(current) = rownames_current
           colnames(current) = "value"
+          
+          current = cbind(name = rownames_current, current)
         }
         
         if(input$assayType == "seq"){
           
           current = matrix(NA, nrow = 9, ncol = 1)
           
-          objFile = parseFilePaths(roots, input$file)$datapath[1]
+          objFile = input$file$name
           
           current[1,1] = as.character(objFile)
           current[2,1] = input$responseType_seq
@@ -631,7 +625,7 @@ shinyServer(function(input, output, session) {
           current[8,1] = input$numberOfNeighbors
           current[9,1] = input$random.seed
           
-          rownames_current = c("File Path", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Number of permutations", "Number of neighbors for KNN", "Seed for Random number generator")  
+          rownames_current = c("File Name", "Data Type", "Array or Seq data?", "Arrays centered?", "Delta", "Minimum fold change", "Number of permutations", "Number of neighbors for KNN", "Seed for Random number generator")  
           
           if(input$responseType_seq == "Quantitative" || input$responseType_seq == "Survival" || input$responseType_seq == "Multiclass"){
             current = matrix(current[c(-6),], ncol = 1)
@@ -640,6 +634,8 @@ shinyServer(function(input, output, session) {
           
           rownames(current) = rownames_current
           colnames(current) = "value"
+          
+          current = cbind(name = rownames_current, current)
         }
         
         current
@@ -933,7 +929,11 @@ shinyServer(function(input, output, session) {
     min.foldchange = input$min.foldchange
     
     inputParameters = getInputParameters()
+    inputParameters = inputParameters[,-1, drop = FALSE]
+      
     computedValues = getComputedValues()
+    computedValues = computedValues[,-1, drop = FALSE]
+    
     eigengene = getEigengene()
     imputedX = getImputedX()
     originalX = getOriginalX()
@@ -1062,16 +1062,16 @@ shinyServer(function(input, output, session) {
       writeData(wb, sheet = "Current Settings", x = "Input Parameters")
       addStyle(wb, sheet = "Current Settings", titleStyle, rows = 1, cols = 1)
       writeData(wb, sheet = "Current Settings", x = newInputParameters, startRow = 2)
-      
+
       currentsettingsrow = nrow(newInputParameters) + 4
       writeData(wb, sheet = "Current Settings", x = "Computed Values", startRow = currentsettingsrow)
       addStyle(wb, sheet = "Current Settings", titleStyle, rows = currentsettingsrow, cols = 1)
-      
+
       newComputedValues = cbind(rownames(computedValues), computedValues)
       colnames(newComputedValues) = c("Questions","Values")
       writeData(wb, sheet = "Current Settings", x = newComputedValues, startRow = currentsettingsrow + 1)
-      
-      
+
+
       if(!is.null(eigengene)){
         currentsettingsrow = currentsettingsrow + nrow(newComputedValues)
         writeData(wb, sheet = "Current Settings", x = "Eigengene", startRow = currentsettingsrow + 3)
@@ -1083,13 +1083,6 @@ shinyServer(function(input, output, session) {
     if(!is.null(samr.obj)){
       fname = paste(file, "xlsx", sep = ".")
       saveWorkbook(wb, file.path(dir, fname), overwrite = TRUE)
-      
-      if(Sys.info()[['sysname']] == "Windows"){
-        shell(file.path(dir, fname))  
-      } else if(Sys.info()[['sysname']] == "Darwin"){
-        system(paste("open", fname))
-      }
-          
     }
     
     
@@ -1119,7 +1112,9 @@ shinyServer(function(input, output, session) {
         geneSetTableGenes = GSA.correlate.list$tableGenes
                
         inputParameters = getInputParameters2()
+        inputParameters = inputParameters[,-1,drop=F]
         computedValues = getComputedValues2()
+        computedValues = computedValues[,-1,drop=F]
         
         originalX = getOriginalX()
         imputedX = getImputedX()
@@ -1237,12 +1232,6 @@ shinyServer(function(input, output, session) {
         if(!is.null(GSA)){
           fname = paste(file, "xlsx", sep = ".")
           saveWorkbook(wb, file.path(dir, fname), overwrite = TRUE)
-          
-          if(Sys.info()[['sysname']] == "Windows"){
-            shell(file.path(dir, fname))  
-          } else if(Sys.info()[['sysname']] == "Darwin"){
-            system(paste("open", fname))
-          }
           
         }
         

@@ -8,12 +8,9 @@ shinyUI(fluidPage(
     column(3, 
     wellPanel(
     
-    textInput("FileName", "File:", value = ""),
-    
     tags$div(title="Click here to select data you would like to analyze",
-      shinyFilesButton('file', 'Select a File', 'Please select a file', FALSE)         
+       fileInput('file', 'Choose XLSX File')
     ),
-    br(),
     conditionalPanel(condition = "input.analysisType == 'Standard'",
       tags$div(title= "Specify the type of analysis from below, then press Run",
         actionButton("goButton", "Run")         
