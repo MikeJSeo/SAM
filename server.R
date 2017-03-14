@@ -4,7 +4,6 @@ library(openxlsx)
 library(samr)
 library(GSA)
 library(shiny)
-library(shinyFiles)
 
 source("GSA.listsets.revised.R")
 source("GSA.correlate.revised.R")
