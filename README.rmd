@@ -18,7 +18,7 @@ library(shiny)
 runGitHub("SAM", "MikeJSeo")
 ```
 
-That will bring up a browser window with a user interface. More details are provided in the manual sam.pdf in this directory
+That will bring up a browser window with a user interface. More details are provided in the sam-manual.pdf in this directory. Example data are in Data examples folder and sample output is in the Sample Output folder.
 
 Please post to the group regarding any issues. This will help us ensure we have all the kinks ironed out before merging the code 
 into the next version of the `samr` package.
