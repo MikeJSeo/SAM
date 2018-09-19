@@ -2,14 +2,21 @@
 
 First make sure you have a very recent version of R or RStudio.
 
-Next install required packages. Cut and paste what's below in an R session.
+Next install required packages. Cut and paste what's below in an R session. You only need to do this once.
 
 ```{r}
-install.packages(c("samr", "matrixStats", "GSA", "shiny", "openxlsx"))
+install.packages(c("matrixStats", "GSA", "shiny", "openxlsx"))
 source("http://bioconductor.org/biocLite.R")
 biocLite("impute")
+
+#install.packages("devtools") if devtools not installed
+library(devtools)
+install_github("cran/samr")
 ```
-You only need to do this once.
+
+You may need to download R tools: 
+
+https://cran.r-project.org/bin/windows/Rtools/
 
 Then, you may run SAM any time in an R session as follows.
 
