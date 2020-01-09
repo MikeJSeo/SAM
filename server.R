@@ -855,7 +855,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$Allgenes.table.up = renderDataTable({
+  output$Allgenes.table.up = renderTable({
     Allgenes = getAllgenesTable()      
     if(!is.null(Allgenes$genes.up)){
       genes.up = Allgenes$genes.up
@@ -864,7 +864,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$Allgenes.table.lo = renderDataTable({
+  output$Allgenes.table.lo = renderTable({
     Allgenes = getAllgenesTable()  
     if(!is.null(Allgenes$genes.lo)){
       genes.lo = Allgenes$genes.lo
@@ -873,7 +873,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$siggenes.table.up <- renderDataTable({
+  output$siggenes.table.up <- renderTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.up)){
       genes.up = siggenes.table$genes.up
@@ -883,7 +883,7 @@ shinyServer(function(input, output, session) {
   
   })
   
-  output$siggenes.table.lo <- renderDataTable({
+  output$siggenes.table.lo <- renderTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.lo)){     
       genes.lo = siggenes.table$genes.lo
