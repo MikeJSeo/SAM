@@ -855,7 +855,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$Allgenes.table.up = renderTable({
+  output$Allgenes.table.up = renderDataTable({
     Allgenes = getAllgenesTable()      
     if(!is.null(Allgenes$genes.up)){
       genes.up = Allgenes$genes.up
@@ -864,26 +864,26 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$Allgenes.table.lo = renderTable({
+  output$Allgenes.table.lo = DT::renderDataTable({
     Allgenes = getAllgenesTable()  
     if(!is.null(Allgenes$genes.lo)){
       genes.lo = Allgenes$genes.lo
       genes.lo[,4:7] = round(as.numeric(as.character(genes.lo[,4:7])),4) 
-      genes.lo
+      DT::datatable(genes.lo)
     }
   })
   
-  output$siggenes.table.up <- renderTable({
+  output$siggenes.table.up <- DT::renderDataTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.up)){
       genes.up = siggenes.table$genes.up
       genes.up[,4:7] = round(as.numeric(as.character(genes.up[,4:7])),4) 
-      genes.up
+      DT::datatable(genes.up)
     }
   
   })
   
-  output$siggenes.table.lo <- renderTable({
+  output$siggenes.table.lo <- renderDataTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.lo)){     
       genes.lo = siggenes.table$genes.lo
