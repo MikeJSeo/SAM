@@ -4,7 +4,7 @@ First make sure you have a very recent version of R or RStudio.
 
 Next install required packages. Cut and paste what's below in an R session. You only need to do this once.
 
-```{r}
+```{r, eval = FALSE}
 install.packages(c("matrixStats", "GSA", "shiny", "openxlsx"))
 source("http://bioconductor.org/biocLite.R")
 biocLite("impute")
@@ -22,6 +22,7 @@ Then, you may run SAM any time in an R session as follows.
 
 ```{r}
 library(shiny)
+library(impute)
 runGitHub("SAM", "MikeJSeo")
 ```
 
