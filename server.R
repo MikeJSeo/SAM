@@ -873,17 +873,17 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$siggenes.table.up <- DT::renderDataTable({
+  output$siggenes.table.up <- renderTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.up)){
       genes.up = siggenes.table$genes.up
       genes.up[,4:7] = round(as.numeric(as.character(genes.up[,4:7])),4) 
-      DT::datatable(genes.up)
+      genes.up
     }
   
   })
   
-  output$siggenes.table.lo <- renderDataTable({
+  output$siggenes.table.lo <- renderTable({
     siggenes.table = getSiggenesTable()
     if(!is.null(siggenes.table$genes.lo)){     
       genes.lo = siggenes.table$genes.lo
