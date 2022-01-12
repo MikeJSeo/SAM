@@ -1,3 +1,10 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+
 # Web-enabled and Cross-platform SAM via Shiny
 
 First make sure you have a very recent version of R or RStudio.
