@@ -23,7 +23,7 @@ https://cran.r-project.org/bin/windows/Rtools/
 
 Then, you may run SAM any time in an R session as follows.
 
-```{r}
+```{r, eval = FALSE}
 library(shiny)
 library(impute)
 runGitHub("SAM", "MikeJSeo")
