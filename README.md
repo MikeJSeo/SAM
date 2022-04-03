@@ -1,4 +1,5 @@
-# Web-enabled and Cross-platform SAM via Shiny
+Web-enabled and Cross-platform SAM via Shiny
+============================================
 
 First make sure you have a very recent version of R or RStudio.
 
@@ -6,7 +7,7 @@ Next install required packages. Cut and paste what’s below in an R
 session. You only need to do this once.
 
 ``` r
-install.packages(c("matrixStats", "GSA", "shiny", "openxlsx"))
+install.packages(c("matrixStats", "GSA", "shiny", "openxlsx", "Rcpp"))
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
@@ -20,7 +21,7 @@ install.packages("samr")
 
 You may need to download R tools:
 
-<https://cran.r-project.org/bin/windows/Rtools/>
+<a href="https://cran.r-project.org/bin/windows/Rtools/" class="uri">https://cran.r-project.org/bin/windows/Rtools/</a>
 
 Then, you may run SAM any time in an R session as follows.
 
@@ -42,8 +43,8 @@ Please post to the group regarding any issues. This will help us ensure
 we have all the kinks ironed out before merging the code into the next
 version of the `samr` package.
 
-Note that users should use Firefox or Chrome as the \_default_browser on
-Windows: IE will not work.
+Note that users should use Firefox or Chrome as the \_default\_browser
+on Windows: IE will not work.
 
 Thank you,  
 Michael Seo

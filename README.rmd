@@ -12,7 +12,7 @@ First make sure you have a very recent version of R or RStudio.
 Next install required packages. Cut and paste what's below in an R session. You only need to do this once.
 
 ```{r, eval = FALSE}
-install.packages(c("matrixStats", "GSA", "shiny", "openxlsx"))
+install.packages(c("matrixStats", "GSA", "shiny", "openxlsx", "Rcpp"))
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
